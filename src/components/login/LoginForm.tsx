@@ -233,11 +233,11 @@ export default function LoginForm() {
           </div>
 
           {/* Server Error */}
-          <div ref={errorRef} className="h-0 overflow-hidden opacity-0">
+          <div ref={errorRef} className="h-0 overflow-hidden opacity-0 ">
             {errors.root?.message && (
               <div
                 role="alert"
-                className="border-destructive/30 bg-destructive/5 border px-4 py-3"
+                className="border-destructive/30 bg-destructive/5 border px-4 py-3 rounded-lg"
               >
                 <p className="text-destructive text-[13px] leading-5">
                   {errors.root.message}
