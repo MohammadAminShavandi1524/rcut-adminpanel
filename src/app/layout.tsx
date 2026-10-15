@@ -9,6 +9,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
 
 import { CustomToastProvider } from "@/components/ui/custom-toast";
+import Sidebar from "@/components/Layout/Sidebar";
 
 export const metadata: Metadata = {
   title: {
@@ -28,8 +29,9 @@ export default function RootLayout({
       <body className="font-IRANYekanX">
         <AppToaster />
 
-        <div className="text-foreground bg-background relative min-h-screen">
-          <main className="headerPadding">
+        <div className="bg-background text-foreground flex h-screen overflow-hidden">
+          <Sidebar />
+          <main className="flex flex-1 flex-col overflow-hidden">
             <CustomToastProvider>{children}</CustomToastProvider>
           </main>
         </div>

@@ -251,7 +251,7 @@ export default function LoginForm() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-primary text-primary-foreground flex h-[50px] w-full items-center justify-center gap-2 rounded-md px-4 text-[15px] font-medium transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+              className="bg-primary text-primary-foreground flex h-[50px] w-full items-center justify-center gap-2 rounded-md px-4 text-[15px] font-medium transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
             >
               <LogIn size={18} strokeWidth={1.8} />
 
