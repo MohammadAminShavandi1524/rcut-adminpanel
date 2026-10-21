@@ -1,18 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
+
 import { LogIn } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 
 import { FormField } from "@/components/FormField";
 
 import { login } from "./auth.api";
 import { createLoginSchema, type LoginFormValues } from "./login.schema";
-
-gsap.registerPlugin(useGSAP);
+import { useLoginAnimation } from "./useLoginAnimation";
 
 export default function LoginForm() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -34,6 +32,8 @@ export default function LoginForm() {
     },
   });
 
+  useLoginAnimation(containerRef, errorRef, errors.root?.message);
+
   const onSubmit = async (data: LoginFormValues) => {
     try {
       clearErrors("root");
@@ -51,153 +51,16 @@ export default function LoginForm() {
     }
   };
 
-  useGSAP(
-    () => {
-      if (!containerRef.current) return;
-
-      const reduceMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-
-      if (reduceMotion) return;
-
-      const timeline = gsap.timeline({
-        defaults: {
-          ease: "power3.out",
-        },
-      });
-
-      timeline.fromTo(
-        ".login-card",
-        {
-          opacity: 0,
-          y: 22,
-        },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.75,
-        },
-      );
-
-      timeline.fromTo(
-        ".login-heading",
-        {
-          opacity: 0,
-          y: 12,
-        },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.5,
-        },
-        "-=0.4",
-      );
-
-      timeline.fromTo(
-        ".login-line",
-        {
-          scaleX: 0,
-        },
-        {
-          scaleX: 1,
-          duration: 0.65,
-          transformOrigin: "right center",
-        },
-        "-=0.3",
-      );
-
-      timeline.fromTo(
-        ".login-field",
-        {
-          opacity: 0,
-          y: 12,
-        },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.45,
-          stagger: 0.08,
-        },
-        "-=0.2",
-      );
-
-      timeline.fromTo(
-        ".login-submit",
-        {
-          opacity: 0,
-          y: 10,
-        },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.45,
-        },
-        "-=0.15",
-      );
-
-      timeline.fromTo(
-        ".login-footer",
-        {
-          opacity: 0,
-        },
-        {
-          opacity: 1,
-          duration: 0.45,
-        },
-        "-=0.15",
-      );
-    },
-    {
-      scope: containerRef,
-    },
-  );
-
-  useEffect(() => {
-    if (!errorRef.current) return;
-
-    if (errors.root?.message) {
-      gsap.fromTo(
-        errorRef.current,
-        {
-          height: 0,
-          opacity: 0,
-          y: -6,
-          marginTop: 0,
-        },
-        {
-          height: "auto",
-          opacity: 1,
-          y: 0,
-          marginTop: 20,
-          duration: 0.4,
-          ease: "power3.out",
-        },
-      );
-
-      return;
-    }
-
-    gsap.to(errorRef.current, {
-      height: 0,
-      opacity: 0,
-      y: -6,
-      marginTop: 0,
-      duration: 0.3,
-      ease: "power2.inOut",
-    });
-  }, [errors.root?.message]);
-
   return (
     <div
       ref={containerRef}
       dir="rtl"
       className="relative z-10 w-full max-w-[430px]"
     >
-      <div className="login-card border-border bg-background overflow-hidden rounded-lg border p-8 shadow-[0_8px_30px_rgba(0,0,0,0.035)]">
+      <div className="login-card border-border bg-background s:p-5 3xl:p-8 overflow-hidden rounded-lg border p-4 shadow-[0_8px_30px_rgba(0,0,0,0.035)] lg:p-6 xl:p-7">
         {/* Heading */}
-        <div className="login-heading relative mb-8 pb-6">
-          <h1 className="text-foreground text-[24px] leading-[1.3] font-semibold">
+        <div className="login-heading 3xl:mb-8 3xl:pb-6 relative mb-6 pb-5 lg:mb-7 lg:pb-5">
+          <h1 className="text-foreground s:text-[20px] 3xl:text-[24px] 3xl:leading-[1.3] text-[19px] leading-[1.5] font-semibold lg:text-[21px] xl:text-[22px]">
             ورود به پنل مدیریت
           </h1>
 
@@ -208,8 +71,9 @@ export default function LoginForm() {
         <form
           onSubmit={handleSubmit(onSubmit)}
           noValidate
-          className="space-y-5"
+          className="3xl:space-y-5 space-y-4 lg:space-y-4.5"
         >
+          {/* Email */}
           <div className="login-field">
             <FormField
               label="ایمیل"
@@ -221,6 +85,7 @@ export default function LoginForm() {
             />
           </div>
 
+          {/* Password */}
           <div className="login-field">
             <FormField
               label="رمز عبور"
@@ -237,9 +102,9 @@ export default function LoginForm() {
             {errors.root?.message && (
               <div
                 role="alert"
-                className="border-destructive/30 bg-destructive/5 border px-4 py-3 rounded-lg"
+                className="border-destructive/30 bg-destructive/5 rounded-lg border px-3 py-2.5 lg:px-4 lg:py-3"
               >
-                <p className="text-destructive text-[13px] leading-5">
+                <p className="text-destructive 3xl:text-[13px] text-justify text-[12px] leading-5">
                   {errors.root.message}
                 </p>
               </div>
@@ -247,13 +112,16 @@ export default function LoginForm() {
           </div>
 
           {/* Submit */}
-          <div className="login-submit pt-2">
+          <div className="login-submit 3xl:pt-2 pt-1 lg:pt-1.5">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-primary text-primary-foreground flex h-[50px] w-full items-center justify-center gap-2 rounded-md px-4 text-[15px] font-medium transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
+              className="bg-primary text-primary-foreground s:h-11.5 3xl:h-[50px] 3xl:text-[15px] flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-md px-3 text-[13px] font-medium transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 lg:h-12 lg:px-4 lg:text-[14px]"
             >
-              <LogIn size={18} strokeWidth={1.8} />
+              <LogIn
+                className="3xl:size-[18px] size-[16px] lg:size-[17px]"
+                strokeWidth={1.8}
+              />
 
               {isSubmitting ? "در حال ورود..." : "ورود به پنل"}
             </button>
@@ -261,8 +129,8 @@ export default function LoginForm() {
         </form>
 
         {/* Footer */}
-        <div className="login-footer border-border mt-7 border-t pt-5">
-          <p className="text-muted-foreground text-center text-xs leading-5">
+        <div className="login-footer border-border 3xl:mt-7 3xl:pt-5 mt-5 border-t pt-4 lg:mt-6 lg:pt-4.5">
+          <p className="text-muted-foreground s:text-[11px] 3xl:text-xs text-center text-[10px] leading-5">
             دسترسی به این بخش فقط برای کاربران مجاز امکان‌پذیر است.
           </p>
         </div>
