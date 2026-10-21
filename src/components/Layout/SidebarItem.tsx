@@ -20,15 +20,20 @@ const SidebarItem = ({
   return (
     <Link
       href={href}
+      aria-current={active ? "page" : undefined}
       className={cn(
-        "group relative mb-1 flex h-12 items-center gap-2.5 rounded-lg border px-3.5",
-        "text-[15px] font-medium",
+        "group relative mb-1 flex items-center rounded-lg border",
+        "h-10 gap-2 px-2.5 text-[13px] font-medium",
+        "xl:h-11 xl:gap-2.5 xl:px-3 xl:text-[14px]",
+        "2xl:h-11.5",
+        "3xl:h-12 3xl:px-3.5 3xl:text-[15px]",
         "transition-[background-color,border-color,color] duration-300",
         active
           ? "border-border bg-secondary-bg text-foreground"
           : "text-muted-foreground hover:border-border hover:bg-secondary-bg/60 hover:text-foreground border-transparent",
       )}
     >
+      {/* Active Indicator */}
       <span
         className={cn(
           "bg-custom-primary absolute inset-y-2 start-0 w-[3px] rounded-e-full",
@@ -37,17 +42,24 @@ const SidebarItem = ({
         )}
       />
 
+      {/* Icon */}
       <span
         className={cn(
-          "flex size-7 shrink-0 items-center justify-center transition-colors duration-300",
+          "flex size-6 shrink-0 items-center justify-center transition-colors duration-300",
+          "xl:size-6.5",
+          "3xl:size-7",
           active
             ? "text-custom-primary"
             : "text-muted-foreground group-hover:text-foreground",
         )}
       >
-        <Icon size={19} strokeWidth={1.8} />
+        <Icon
+          className="3xl:size-[19px] size-[17px] xl:size-[18px]"
+          strokeWidth={1.8}
+        />
       </span>
 
+      {/* Title */}
       <span className="min-w-0 truncate">{title}</span>
     </Link>
   );

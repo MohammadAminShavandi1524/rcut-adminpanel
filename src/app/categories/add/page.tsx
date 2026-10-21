@@ -1,0 +1,19 @@
+import AddCategoryForm from "@/components/categories/add-category/AddCategoryForm";
+import HeaderLayout from "@/components/Layout/HeaderLayout";
+
+const Page = () => {
+  return (
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+      <HeaderLayout
+        title="افزودن دسته‌بندی"
+        descrption="ایجاد دسته‌بندی اصلی برای محصولات فروشگاه"
+      />
+
+      <div className="3xl:px-8 3xl:py-6 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden px-4 py-4 xl:px-5 xl:py-5 2xl:px-6">
+        <AddCategoryForm />
+      </div>
+    </div>
+  );
+};
+
+export default Page;
