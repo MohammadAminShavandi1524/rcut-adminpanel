@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 
-import { LogIn } from "lucide-react";
+import { Eye, EyeOff, LogIn } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
@@ -15,6 +15,8 @@ import { useLoginAnimation } from "./useLoginAnimation";
 export default function LoginForm() {
   const containerRef = useRef<HTMLDivElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const schema = useMemo(() => createLoginSchema(), []);
 
@@ -86,19 +88,41 @@ export default function LoginForm() {
           </div>
 
           {/* Password */}
-          <div className="login-field">
+          <div className="login-field relative">
             <FormField
               label="رمز عبور"
-              type="password"
+              type={showPassword ? "text" : "password"}
               autoComplete="current-password"
               placeholder="رمز عبور خود را وارد کنید"
               register={register("password")}
               error={errors.password}
             />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword((previous) => !previous)}
+              aria-label={
+                showPassword ? "مخفی کردن رمز عبور" : "نمایش رمز عبور"
+              }
+              aria-pressed={showPassword}
+              className="text-muted-foreground hover:text-foreground absolute bottom-2 left-3 flex size-8 cursor-pointer items-center justify-center rounded-md transition-colors duration-200"
+            >
+              {showPassword ? (
+                <EyeOff
+                  className="size-[18px]"
+                  strokeWidth={1.8}
+                />
+              ) : (
+                <Eye
+                  className="size-[18px]"
+                  strokeWidth={1.8}
+                />
+              )}
+            </button>
           </div>
 
           {/* Server Error */}
-          <div ref={errorRef} className="h-0 overflow-hidden opacity-0 ">
+          <div ref={errorRef} className="h-0 overflow-hidden opacity-0">
             {errors.root?.message && (
               <div
                 role="alert"

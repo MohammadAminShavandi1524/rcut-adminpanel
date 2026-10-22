@@ -2,6 +2,8 @@
 
 import { useRef } from "react";
 
+import Image from "next/image";
+
 import { FolderPlus, LayoutDashboard, Mail, Tags } from "lucide-react";
 
 import { usePathname } from "next/navigation";
@@ -31,15 +33,30 @@ const Sidebar = () => {
       className="border-border-secondary bg-background 3xl:w-[285px] flex h-screen w-[240px] shrink-0 flex-col border-l pb-4 xl:w-[255px] 2xl:w-[270px]"
     >
       {/* Header */}
-      <div className="sidebar-brand 3xl:px-4 shrink-0 px-3 xl:px-3.5">
+      <div className="sidebar-brand 3xl:px-2.5 shrink-0 px-1.5 xl:px-2">
         <div className="border-border-secondary 3xl:min-h-[78px] flex min-h-[68px] items-center border-b px-2 xl:min-h-[72px] 2xl:min-h-[76px]">
-          <div className="flex min-w-0 flex-col">
-            <div className="text-foreground 3xl:text-[20px] truncate text-[17px] font-semibold xl:text-[18px] 2xl:text-[19px]">
-              آرکات
+          <div className="3xl:gap-3.5 flex min-w-0 items-center gap-2.5 xl:gap-3">
+            {/* Logo */}
+            <div className="3xl:w-[75px] aspect-[459/321] w-[60px] shrink-0 xl:w-[65px] 2xl:w-[70px]">
+              <Image
+                src="/logo.webp"
+                alt="لوگوی آرکات"
+                width={459}
+                height={321}
+                priority
+                className="size-full object-contain"
+              />
             </div>
 
-            <div className="text-muted-foreground 3xl:text-[16px] mt-0 truncate text-[13px] xl:text-[14px] 2xl:text-[15px]">
-              پنل مدیریت
+            {/* Brand Text */}
+            <div className="flex min-w-0 flex-col">
+              <div className="text-foreground 3xl:text-[20px] truncate text-[17px] font-semibold xl:text-[18px] 2xl:text-[19px]">
+                آرکات
+              </div>
+
+              <div className="text-muted-foreground 3xl:text-[16px] mt-0 truncate text-[13px] xl:text-[14px] 2xl:text-[15px]">
+                پنل مدیریت
+              </div>
             </div>
           </div>
         </div>
