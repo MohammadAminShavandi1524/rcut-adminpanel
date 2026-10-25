@@ -4,7 +4,14 @@ import { useRef } from "react";
 
 import Image from "next/image";
 
-import { FolderPlus, LayoutDashboard, Mail, Tags } from "lucide-react";
+import {
+  FolderPlus,
+  LayoutDashboard,
+  Mail,
+  Package,
+  PackagePlus,
+  Tags,
+} from "lucide-react";
 
 import { usePathname } from "next/navigation";
 
@@ -113,6 +120,28 @@ const Sidebar = () => {
               title="افزودن دسته‌بندی"
               icon={FolderPlus}
               active={pathname === "/categories/add"}
+            />
+          </div>
+
+          {/* Products */}
+          <div className="sidebar-section">
+            <SideBarItemHeader label="مدیریت محصولات" />
+
+            <SidebarItem
+              href="/products"
+              title="لیست محصولات"
+              icon={Package}
+              active={
+                pathname === "/products" ||
+                pathname.startsWith("/products/edit/")
+              }
+            />
+
+            <SidebarItem
+              href="/products/add"
+              title="افزودن محصول"
+              icon={PackagePlus}
+              active={pathname === "/products/add"}
             />
           </div>
         </nav>

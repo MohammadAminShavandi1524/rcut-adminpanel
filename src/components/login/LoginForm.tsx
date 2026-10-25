@@ -57,12 +57,12 @@ export default function LoginForm() {
     <div
       ref={containerRef}
       dir="rtl"
-      className="relative z-10 w-full max-w-[430px]"
+      className="3xl:max-w-[460px] relative z-10 w-full max-w-[400px] min-w-0 lg:max-w-[410px] xl:max-w-[420px] 2xl:max-w-[430px]"
     >
-      <div className="login-card border-border bg-background s:p-5 3xl:p-8 overflow-hidden rounded-lg border p-4 shadow-[0_8px_30px_rgba(0,0,0,0.035)] lg:p-6 xl:p-7">
+      <div className="login-card border-border bg-background s:p-5 3xl:p-8 overflow-hidden rounded-lg border p-4 shadow-[0_8px_30px_rgba(0,0,0,0.035)] lg:p-5 xl:p-6 2xl:p-7">
         {/* Heading */}
-        <div className="login-heading 3xl:mb-8 3xl:pb-6 relative mb-6 pb-5 lg:mb-7 lg:pb-5">
-          <h1 className="text-foreground s:text-[20px] 3xl:text-[24px] 3xl:leading-[1.3] text-[19px] leading-[1.5] font-semibold lg:text-[21px] xl:text-[22px]">
+        <div className="login-heading 3xl:mb-8 3xl:pb-6 relative mb-5 pb-4 lg:mb-6 lg:pb-5 xl:mb-7 2xl:mb-7">
+          <h1 className="text-foreground s:text-[20px] 3xl:text-[24px] 3xl:leading-[1.3] text-[19px] leading-[1.5] font-semibold lg:text-[20px] xl:text-[21px] 2xl:text-[22px]">
             ورود به پنل مدیریت
           </h1>
 
@@ -73,7 +73,7 @@ export default function LoginForm() {
         <form
           onSubmit={handleSubmit(onSubmit)}
           noValidate
-          className="3xl:space-y-5 space-y-4 lg:space-y-4.5"
+          className="3xl:space-y-5 space-y-4 lg:space-y-4 xl:space-y-4.5 2xl:space-y-5"
         >
           {/* Email */}
           <div className="login-field">
@@ -105,16 +105,16 @@ export default function LoginForm() {
                 showPassword ? "مخفی کردن رمز عبور" : "نمایش رمز عبور"
               }
               aria-pressed={showPassword}
-              className="text-muted-foreground hover:text-foreground absolute bottom-2 left-3 flex size-8 cursor-pointer items-center justify-center rounded-md transition-colors duration-200"
+              className="text-muted-foreground hover:text-foreground absolute bottom-1.5 left-2.5 flex size-8 cursor-pointer items-center justify-center rounded-md transition-colors duration-200 lg:bottom-2 lg:left-3 xl:size-8.5 2xl:size-9"
             >
               {showPassword ? (
-                <EyeOff
-                  className="size-[18px]"
+                <Eye
+                  className="3xl:size-[19px] size-[17px] xl:size-[18px]"
                   strokeWidth={1.8}
                 />
               ) : (
-                <Eye
-                  className="size-[18px]"
+                <EyeOff
+                  className="3xl:size-[19px] size-[17px] xl:size-[18px]"
                   strokeWidth={1.8}
                 />
               )}
@@ -128,7 +128,7 @@ export default function LoginForm() {
                 role="alert"
                 className="border-destructive/30 bg-destructive/5 rounded-lg border px-3 py-2.5 lg:px-4 lg:py-3"
               >
-                <p className="text-destructive 3xl:text-[13px] text-justify text-[12px] leading-5">
+                <p className="text-destructive 3xl:text-[13px] text-justify text-[12px] leading-5 xl:leading-6">
                   {errors.root.message}
                 </p>
               </div>
@@ -140,10 +140,10 @@ export default function LoginForm() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-primary text-primary-foreground s:h-11.5 3xl:h-[50px] 3xl:text-[15px] flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-md px-3 text-[13px] font-medium transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 lg:h-12 lg:px-4 lg:text-[14px]"
+              className="bg-primary text-primary-foreground s:h-11.5 3xl:h-[50px] 3xl:text-[15px] flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-md px-3 text-[13px] font-medium transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 lg:h-11.5 lg:px-4 lg:text-[13px] xl:h-12 xl:text-[14px] 2xl:h-12.5"
             >
               <LogIn
-                className="3xl:size-[18px] size-[16px] lg:size-[17px]"
+                className="3xl:size-[18px] size-4 xl:size-[17px]"
                 strokeWidth={1.8}
               />
 
@@ -153,8 +153,8 @@ export default function LoginForm() {
         </form>
 
         {/* Footer */}
-        <div className="login-footer border-border 3xl:mt-7 3xl:pt-5 mt-5 border-t pt-4 lg:mt-6 lg:pt-4.5">
-          <p className="text-muted-foreground s:text-[11px] 3xl:text-xs text-center text-[10px] leading-5">
+        <div className="login-footer border-border 3xl:mt-7 3xl:pt-5 mt-5 border-t pt-4 lg:mt-5 xl:mt-6 2xl:mt-6 2xl:pt-4.5">
+          <p className="text-muted-foreground s:text-[11px] 3xl:text-xs text-center text-[10px] leading-5 lg:text-[11px]">
             دسترسی به این بخش فقط برای کاربران مجاز امکان‌پذیر است.
           </p>
         </div>

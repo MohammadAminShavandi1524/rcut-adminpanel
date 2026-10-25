@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1156.0",
     "@gsap/react": "2.1.2",
     "@hookform/resolvers": "5.9.1",
     "@lottiefiles/dotlottie-react": "0.19.16",
