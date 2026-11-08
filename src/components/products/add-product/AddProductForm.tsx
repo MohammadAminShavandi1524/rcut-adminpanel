@@ -13,6 +13,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { CustomButton } from "@/components/ui/custom-button";
 import { useCustomToast } from "@/components/ui/custom-toast";
 
+import ProductBrandSelect from "../ProductBrandSelect";
+
 import { addProductSchema, type AddProductValues } from "./add-product.schema";
 
 import { createProduct, uploadProductImage } from "./add-product.api";
@@ -28,7 +30,6 @@ const AddProductForm = () => {
   const formRef = useRef<HTMLFormElement>(null);
 
   const [isUploading, setIsUploading] = useState(false);
-
   const [uploadProgress, setUploadProgress] = useState(0);
 
   useAddProductAnimation(formRef);
@@ -46,6 +47,7 @@ const AddProductForm = () => {
       name: "",
       description: "",
       category_id: 0,
+      brand_id: null,
       image: undefined,
     },
   });
@@ -67,12 +69,14 @@ const AddProductForm = () => {
         description: values.description.trim(),
         image: imageUrl,
         category_id: values.category_id,
+        brand_id: values.brand_id,
       });
 
       reset({
         name: "",
         description: "",
         category_id: 0,
+        brand_id: null,
         image: undefined,
       });
 
@@ -104,8 +108,9 @@ const AddProductForm = () => {
         </h2>
 
         <p className="text-muted-foreground 3xl:text-sm 3xl:leading-7 mt-2 text-justify text-xs leading-6 xl:text-[13px]">
-          ابتدا دسته بندی نهایی را انتخاب کنید سپس نام و توضیحات محصول و تصویر
-          آن را وارد کنید. پس از آپلود تصویر محصول در فروشگاه ثبت میشود.
+          ابتدا دسته بندی نهایی را انتخاب کنید. انتخاب برند اختیاری است. سپس
+          نام، توضیحات و تصویر محصول را وارد کنید. پس از آپلود تصویر، محصول در
+          فروشگاه ثبت می‌شود.
         </p>
       </aside>
 
@@ -127,6 +132,22 @@ const AddProductForm = () => {
                   <ProductCategorySelect
                     field={field}
                     error={errors.category_id}
+                  />
+                )}
+              />
+            </div>
+
+            {/* Brand - Optional */}
+            <div className="add-product-field min-w-0">
+              <Controller
+                control={control}
+                name="brand_id"
+                render={({ field }) => (
+                  <ProductBrandSelect
+                    value={field.value}
+                    onChange={field.onChange}
+                    error={errors.brand_id?.message}
+                    disabled={isSubmitting}
                   />
                 )}
               />

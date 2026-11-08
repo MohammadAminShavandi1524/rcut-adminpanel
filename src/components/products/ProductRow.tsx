@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { CheckSquare2, Edit, Eye, Package, Square, Trash } from "lucide-react";
+import { Edit, Eye, Package, Trash } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -25,6 +25,8 @@ const ProductRow = ({ product, onDelete }: ProductRowProps) => {
       ? `${product.category.parent.name} / ${product.category.name}`
       : product.category.name
     : "-";
+
+  const brandLabel = product.brand?.name ?? "ندارد";
 
   const getCreatedDate = () => {
     if (!product.created) return "-";
@@ -66,13 +68,25 @@ const ProductRow = ({ product, onDelete }: ProductRowProps) => {
         </span>
       </div>
 
-      {/* Category */}
-      <div className="min-w-0 pe-2 xl:pe-4">
+      {/* Category and Brand */}
+      <div className="flex min-w-0 flex-col gap-1 pe-2 xl:pe-4">
         <span
           title={categoryLabel}
           className="text-muted-foreground 3xl:text-[15px] block truncate text-[12px] xl:text-[13px] 2xl:text-sm"
         >
           {categoryLabel}
+        </span>
+
+        <span
+          className="text-muted-foreground block truncate text-[11px] xl:text-[12px]"
+          title={`برند: ${brandLabel}`}
+        >
+          برند:{" "}
+          <span
+            className={cn(product.brand && "text-custom-primary font-medium")}
+          >
+            {brandLabel}
+          </span>
         </span>
       </div>
 

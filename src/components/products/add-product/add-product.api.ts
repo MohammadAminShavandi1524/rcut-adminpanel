@@ -16,6 +16,7 @@ export interface CreateProductPayload {
   description: string;
   image: string;
   category_id: number;
+  brand_id: number | null;
 }
 
 async function parseResponse(response: Response) {
@@ -104,7 +105,6 @@ export async function uploadProductImage(
         const code = data?.code ? ` (${data.code})` : "";
 
         reject(new Error(`${message}${code}`));
-
         return;
       }
 

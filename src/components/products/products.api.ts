@@ -1,3 +1,5 @@
+import type { ProductBrand } from "./product-brands.api";
+
 export interface ProductCategory {
   id: number;
   name: string;
@@ -16,6 +18,7 @@ export interface Product {
   description: string;
   image: string;
   category: ProductCategory;
+  brand: ProductBrand | null;
   new: boolean;
   top_seller: boolean;
   created: string;
