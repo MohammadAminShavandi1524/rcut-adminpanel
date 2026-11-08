@@ -12,6 +12,8 @@ import {
   PackagePlus,
   Tags,
   BadgePlus,
+  BookOpen,
+  BookPlus,
 } from "lucide-react";
 
 import { usePathname } from "next/navigation";
@@ -133,10 +135,10 @@ const Sidebar = () => {
               title="لیست برندها"
               icon={Tags}
               active={
-                pathname === "/brands" ||
-                pathname.startsWith("/brands/edit/")
+                pathname === "/brands" || pathname.startsWith("/brands/edit/")
               }
             />
+
             <SidebarItem
               href="/brands/add"
               title="افزودن برند"
@@ -164,6 +166,28 @@ const Sidebar = () => {
               title="افزودن محصول"
               icon={PackagePlus}
               active={pathname === "/products/add"}
+            />
+          </div>
+
+          {/* Catalogs */}
+          <div className="sidebar-section">
+            <SideBarItemHeader label="مدیریت کاتالوگ‌ها" />
+
+            <SidebarItem
+              href="/catalogs"
+              title="لیست کاتالوگ‌ها"
+              icon={BookOpen}
+              active={
+                pathname === "/catalogs" ||
+                pathname.startsWith("/catalogs/edit/")
+              }
+            />
+
+            <SidebarItem
+              href="/catalogs/add"
+              title="افزودن کاتالوگ"
+              icon={BookPlus}
+              active={pathname === "/catalogs/add"}
             />
           </div>
         </nav>
