@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { Controller, useForm } from "react-hook-form";
 
@@ -12,6 +13,8 @@ import { FormField } from "@/components/FormField";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CustomButton } from "@/components/ui/custom-button";
 import { useCustomToast } from "@/components/ui/custom-toast";
+
+import ProductBrandSelect from "../ProductBrandSelect";
 
 import {
   editProductSchema,
@@ -27,7 +30,6 @@ import {
 import type { Product } from "../products.api";
 
 import EditProductImageField from "./EditProductImageField";
-import { useRouter } from "next/navigation";
 
 interface EditProductFormProps {
   productId: number;
@@ -40,11 +42,9 @@ const EditProductForm = ({ productId }: EditProductFormProps) => {
   const [product, setProduct] = useState<Product | null>(null);
 
   const [loading, setLoading] = useState(true);
-
   const [loadError, setLoadError] = useState(false);
 
   const [isUploading, setIsUploading] = useState(false);
-
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const {
@@ -59,6 +59,7 @@ const EditProductForm = ({ productId }: EditProductFormProps) => {
     defaultValues: {
       name: "",
       description: "",
+      brand_id: null,
       image: undefined,
       new: false,
       top_seller: false,
@@ -82,6 +83,7 @@ const EditProductForm = ({ productId }: EditProductFormProps) => {
         reset({
           name: data.name,
           description: data.description,
+          brand_id: data.brand?.id ?? null,
           image: undefined,
           new: data.new,
           top_seller: data.top_seller,
@@ -133,26 +135,36 @@ const EditProductForm = ({ productId }: EditProductFormProps) => {
         description: values.description.trim(),
         image: imageUrl,
         category_id: product.category.id,
+        brand_id: values.brand_id,
         new: values.new,
         top_seller: values.top_seller,
       });
 
-      setProduct((prev) =>
-        prev
-          ? {
-              ...prev,
-              name: values.name.trim(),
-              description: values.description.trim(),
-              image: imageUrl ?? prev.image,
-              new: values.new,
-              top_seller: values.top_seller,
-            }
-          : prev,
-      );
+      setProduct((previous) => {
+        if (!previous) return previous;
+
+        const nextBrand =
+          values.brand_id === null
+            ? null
+            : previous.brand?.id === values.brand_id
+              ? previous.brand
+              : null;
+
+        return {
+          ...previous,
+          name: values.name.trim(),
+          description: values.description.trim(),
+          image: imageUrl ?? previous.image,
+          brand: nextBrand,
+          new: values.new,
+          top_seller: values.top_seller,
+        };
+      });
 
       reset({
         name: values.name.trim(),
         description: values.description.trim(),
+        brand_id: values.brand_id,
         image: undefined,
         new: values.new,
         top_seller: values.top_seller,
@@ -220,9 +232,10 @@ const EditProductForm = ({ productId }: EditProductFormProps) => {
         </h2>
 
         <p className="text-muted-foreground 3xl:text-sm 3xl:leading-7 mt-2 text-justify text-xs leading-6 xl:text-[13px]">
-          نام، توضیحات و وضعیت محصول را در صورت نیاز ویرایش کنید. برای تغییر
-          تصویر، تصویر جدیدی انتخاب کنید. در صورتی که تصویر را تغییر ندهید،
-          تصویر فعلی حفظ میشود. دسته بندی محصول قابل تغییر نیست.
+          نام، توضیحات، برند و وضعیت محصول را در صورت نیاز ویرایش کنید. انتخاب
+          برند اختیاری است. برای تغییر تصویر، تصویر جدیدی انتخاب کنید. اگر تصویر
+          را تغییر ندهید، تصویر فعلی حفظ می‌شود. دسته بندی محصول قابل تغییر
+          نیست.
         </p>
       </aside>
 
@@ -250,6 +263,20 @@ const EditProductForm = ({ productId }: EditProductFormProps) => {
                 <span className="min-w-0 truncate">{categoryLabel}</span>
               </div>
             </div>
+
+            {/* Brand - Editable and Optional */}
+            <Controller
+              control={control}
+              name="brand_id"
+              render={({ field }) => (
+                <ProductBrandSelect
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={errors.brand_id?.message}
+                  disabled={isSubmitting}
+                />
+              )}
+            />
 
             {/* Name */}
             <FormField
@@ -288,7 +315,6 @@ const EditProductForm = ({ productId }: EditProductFormProps) => {
                     {...register("new")}
                     className="accent-custom-primary size-4 cursor-pointer"
                   />
-
                   <span>جدید</span>
                 </label>
 
@@ -298,7 +324,6 @@ const EditProductForm = ({ productId }: EditProductFormProps) => {
                     {...register("top_seller")}
                     className="accent-custom-primary size-4 cursor-pointer"
                   />
-
                   <span>پرفروش</span>
                 </label>
               </div>

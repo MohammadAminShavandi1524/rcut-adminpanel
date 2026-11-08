@@ -13,6 +13,8 @@ export const editProductSchema = z.object({
 
   description: z.string().trim().min(1, "توضیحات محصول الزامی است."),
 
+  brand_id: z.number().int().positive("برند انتخاب شده معتبر نیست.").nullable(),
+
   image: z
     .custom<File | undefined>(
       (value) =>
