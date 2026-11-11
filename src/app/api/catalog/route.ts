@@ -6,6 +6,8 @@ import { serverApi } from "@/lib/server-api";
 const payloadSchema = z.object({
   title: z.string().trim().min(1),
   description: z.string().trim().min(1),
+  image: z.url(),
+  brand_id: z.number().int().positive(),
   cover: z.url(),
   file: z.url(),
 });
@@ -16,8 +18,7 @@ function handleApiError(error: unknown) {
     status?: number;
   };
 
-  let detail: unknown =
-    apiError.body ?? "Internal Server Error";
+  let detail: unknown = apiError.body ?? "Internal Server Error";
 
   if (typeof detail === "string") {
     try {
@@ -27,10 +28,7 @@ function handleApiError(error: unknown) {
     }
   }
 
-  return NextResponse.json(
-    { detail },
-    { status: apiError.status ?? 500 },
-  );
+  return NextResponse.json({ detail }, { status: apiError.status ?? 500 });
 }
 
 export async function GET() {
@@ -48,6 +46,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
+
   const parsed = payloadSchema.safeParse(body);
 
   if (!parsed.success) {

@@ -2,6 +2,8 @@ export interface Catalog {
   id: number;
   title: string;
   description: string;
+  image: string | null;
+  brand_id: number;
   cover: string;
   file: string;
   index: number;

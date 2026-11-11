@@ -4,29 +4,40 @@ import { getCategories } from "@/components/categories/categories.api";
 
 import { getProducts } from "@/components/products/products.api";
 
+import { getProductBrands } from "@/components/products/product-brands.api";
+
+import { getCatalogs } from "@/components/catalogs/catalogs.api";
+
 export interface DashboardStats {
   contactMessages: number | null;
   categories: number | null;
+  brands: number | null;
   products: number | null;
-  newProducts: number | null;
-  topSellerProducts: number | null;
+  catalogs: number | null;
 }
 
 export const initialDashboardStats: DashboardStats = {
   contactMessages: null,
   categories: null,
+  brands: null,
   products: null,
-  newProducts: null,
-  topSellerProducts: null,
+  catalogs: null,
 };
 
 export async function getDashboardStats(): Promise<DashboardStats> {
-  const [messagesResult, categoriesResult, productsResult] =
-    await Promise.allSettled([
-      getContactMessages(),
-      getCategories(),
-      getProducts(),
-    ]);
+  const [
+    messagesResult,
+    categoriesResult,
+    brandsResult,
+    productsResult,
+    catalogsResult,
+  ] = await Promise.allSettled([
+    getContactMessages(),
+    getCategories(),
+    getProductBrands(),
+    getProducts(),
+    getCatalogs(),
+  ]);
 
   const stats: DashboardStats = {
     ...initialDashboardStats,
@@ -48,22 +59,28 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     console.error("DASHBOARD CATEGORIES ERROR:", categoriesResult.reason);
   }
 
+  if (brandsResult.status === "fulfilled") {
+    if (Array.isArray(brandsResult.value)) {
+      stats.brands = brandsResult.value.length;
+    }
+  } else {
+    console.error("DASHBOARD BRANDS ERROR:", brandsResult.reason);
+  }
+
   if (productsResult.status === "fulfilled") {
-    const products = productsResult.value;
-
-    if (Array.isArray(products)) {
-      stats.products = products.length;
-
-      stats.newProducts = products.filter(
-        (product) => product.new === true,
-      ).length;
-
-      stats.topSellerProducts = products.filter(
-        (product) => product.top_seller === true,
-      ).length;
+    if (Array.isArray(productsResult.value)) {
+      stats.products = productsResult.value.length;
     }
   } else {
     console.error("DASHBOARD PRODUCTS ERROR:", productsResult.reason);
+  }
+
+  if (catalogsResult.status === "fulfilled") {
+    if (Array.isArray(catalogsResult.value)) {
+      stats.catalogs = catalogsResult.value.length;
+    }
+  } else {
+    console.error("DASHBOARD CATALOGS ERROR:", catalogsResult.reason);
   }
 
   return stats;

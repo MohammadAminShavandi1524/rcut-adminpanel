@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useId, useRef } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import { createPortal } from "react-dom";
 
@@ -14,7 +14,20 @@ import {
 
 import { useContactMessageModalAnimation } from "@/components/contactMessages/useContactMessageModalAnimation";
 
+import { getProductBrands } from "@/components/products/product-brands.api";
+
 import type { Catalog } from "./catalogs.api";
+
+interface CatalogBrand {
+  id?: number;
+  name?: string;
+  title?: string;
+}
+
+type CatalogWithBrand = Catalog & {
+  brand?: CatalogBrand | string | number | null;
+  brand_id?: number | null;
+};
 
 interface Props {
   open: boolean;
@@ -22,25 +35,102 @@ interface Props {
   catalog: Catalog;
 }
 
-const CatalogDetailsModal = ({
-  open,
-  onClose,
-  catalog,
-}: Props) => {
+const getBrandInfo = (
+  catalog: CatalogWithBrand,
+): {
+  name: string | null;
+  id: number | null;
+} => {
+  const brand = catalog.brand;
+
+  if (typeof brand === "string" && brand.trim()) {
+    return {
+      name: brand.trim(),
+      id: catalog.brand_id ?? null,
+    };
+  }
+
+  if (typeof brand === "object" && brand !== null) {
+    const name =
+      typeof brand.name === "string" && brand.name.trim()
+        ? brand.name.trim()
+        : typeof brand.title === "string" && brand.title.trim()
+          ? brand.title.trim()
+          : null;
+
+    const id = Number(brand.id ?? catalog.brand_id);
+
+    return {
+      name,
+      id: Number.isSafeInteger(id) && id > 0 ? id : null,
+    };
+  }
+
+  const id = Number(
+    catalog.brand_id ?? (typeof brand === "number" ? brand : null),
+  );
+
+  return {
+    name: null,
+    id: Number.isSafeInteger(id) && id > 0 ? id : null,
+  };
+};
+
+const CatalogDetailsModal = ({ open, onClose, catalog }: Props) => {
   const backdropRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const titleId = useId();
+
+  const brandInfo = getBrandInfo(catalog as CatalogWithBrand);
+
+  const [fetchedBrand, setFetchedBrand] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!open || brandInfo.name || !brandInfo.id) {
+      return;
+    }
+
+    let active = true;
+
+    const loadBrand = async () => {
+      try {
+        const brands = await getProductBrands();
+
+        if (!active) return;
+
+        const found = brands.find((brand) => Number(brand.id) === brandInfo.id);
+
+        if (found) {
+          setFetchedBrand({
+            id: Number(found.id),
+            name: found.name,
+          });
+        }
+      } catch (error) {
+        console.error("GET CATALOG BRAND ERROR:", error);
+      }
+    };
+
+    void loadBrand();
+
+    return () => {
+      active = false;
+    };
+  }, [open, brandInfo.id, brandInfo.name]);
+
+  const brandName =
+    brandInfo.name ??
+    (fetchedBrand?.id === brandInfo.id ? fetchedBrand.name : null) ??
+    (brandInfo.id ? `شناسه برند: ${brandInfo.id}` : "برند مشخص نیست");
 
   const handleClose = useCallback(() => {
     onClose();
   }, [onClose]);
 
-  useContactMessageModalAnimation(
-    open,
-    handleClose,
-    backdropRef,
-    modalRef,
-  );
+  useContactMessageModalAnimation(open, handleClose, backdropRef, modalRef);
 
   if (!open) return null;
 
@@ -97,6 +187,8 @@ const CatalogDetailsModal = ({
         >
           <div className="3xl:p-6 grid grid-cols-1 gap-5 p-4 sm:p-5 lg:grid-cols-[190px_minmax(0,1fr)] xl:grid-cols-[210px_minmax(0,1fr)]">
             <div className="min-w-0">
+              <p className="text-muted-foreground mb-2 text-xs">تصویر کاور</p>
+
               <div className="border-border bg-secondary-bg/40 flex aspect-[3/4] w-full max-w-[220px] items-center justify-center overflow-hidden rounded-lg border">
                 {catalog.cover ? (
                   <img
@@ -122,6 +214,16 @@ const CatalogDetailsModal = ({
                 <h3 className="text-foreground text-sm leading-7 font-semibold [overflow-wrap:anywhere] sm:text-base">
                   {catalog.title}
                 </h3>
+              </div>
+
+              <div className="min-w-0">
+                <p className="text-muted-foreground mb-2 text-xs">
+                  برند کاتالوگ
+                </p>
+
+                <p className="text-foreground text-sm font-medium">
+                  {brandName}
+                </p>
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
@@ -164,6 +266,39 @@ const CatalogDetailsModal = ({
                 )}
               </div>
             </div>
+          </div>
+
+          <div className="border-border 3xl:px-6 border-t px-4 py-4 sm:px-5 sm:py-5">
+            <h4 className="text-foreground mb-3 text-sm font-semibold">
+              تصویر بنر کاتالوگ
+            </h4>
+
+            {catalog.image ? (
+              <a
+                href={catalog.image}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full max-w-[640px]"
+              >
+                <img
+                  src={catalog.image}
+                  alt={`بنر ${catalog.title}`}
+                  loading="lazy"
+                  className="border-border bg-secondary-bg aspect-[1280/772] w-full rounded-lg border object-contain"
+                />
+              </a>
+            ) : (
+              <div className="border-border bg-secondary-bg/30 flex aspect-[1280/772] w-full max-w-[420px] flex-col items-center justify-center gap-3 rounded-lg border">
+                <ImageIcon
+                  className="text-muted-foreground size-8"
+                  strokeWidth={1.5}
+                />
+
+                <p className="text-muted-foreground text-xs">
+                  تصویری برای بنر ثبت نشده است.
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="border-border 3xl:px-6 border-t px-4 py-4 sm:px-5 sm:py-5">
