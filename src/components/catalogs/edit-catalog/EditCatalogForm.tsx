@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Controller, useForm } from "react-hook-form";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";
 
@@ -13,6 +14,8 @@ import { CustomButton } from "@/components/ui/custom-button";
 import { useCustomToast } from "@/components/ui/custom-toast";
 
 import type { Catalog } from "../catalogs.api";
+
+import CatalogBrandSelect from "../CatalogBrandSelect";
 
 import {
   editCatalogSchema,
@@ -25,15 +28,15 @@ import {
   uploadCatalogMedia,
 } from "./edit-catalog.api";
 
+import type { CatalogMediaKind } from "../add-catalog/add-catalog.api";
+
 import EditCatalogMediaField from "./EditCatalogMediaField";
 
 interface EditCatalogFormProps {
   catalogId: number;
 }
 
-const EditCatalogForm = ({
-  catalogId,
-}: EditCatalogFormProps) => {
+const EditCatalogForm = ({ catalogId }: EditCatalogFormProps) => {
   const toast = useCustomToast();
   const router = useRouter();
 
@@ -42,11 +45,12 @@ const EditCatalogForm = ({
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
 
-  const [uploadingKind, setUploadingKind] = useState<
-    "cover" | "pdf" | null
-  >(null);
+  const [uploadingKind, setUploadingKind] = useState<CatalogMediaKind | null>(
+    null,
+  );
 
   const [coverProgress, setCoverProgress] = useState(0);
+  const [imageProgress, setImageProgress] = useState(0);
   const [pdfProgress, setPdfProgress] = useState(0);
 
   const {
@@ -57,11 +61,12 @@ const EditCatalogForm = ({
     formState: { errors, isSubmitting },
   } = useForm<EditCatalogValues>({
     resolver: zodResolver(editCatalogSchema),
-
     defaultValues: {
       title: "",
       description: "",
+      brand_id: 0,
       cover: undefined,
+      image: undefined,
       file: undefined,
     },
   });
@@ -83,7 +88,9 @@ const EditCatalogForm = ({
         reset({
           title: data.title,
           description: data.description,
+          brand_id: data.brand_id,
           cover: undefined,
+          image: undefined,
           file: undefined,
         });
       } catch (error) {
@@ -117,13 +124,13 @@ const EditCatalogForm = ({
 
     try {
       setCoverProgress(0);
+      setImageProgress(0);
       setPdfProgress(0);
 
-      // Unchanged media must be sent as null.
       let coverUrl: string | null = null;
+      let imageUrl: string | null = null;
       let pdfUrl: string | null = null;
 
-      // Upload only when a new cover has been selected.
       if (values.cover) {
         setUploadingKind("cover");
 
@@ -134,15 +141,20 @@ const EditCatalogForm = ({
         );
       }
 
-      // Upload only when a new PDF has been selected.
+      if (values.image) {
+        setUploadingKind("image");
+
+        imageUrl = await uploadCatalogMedia(
+          values.image,
+          "image",
+          setImageProgress,
+        );
+      }
+
       if (values.file) {
         setUploadingKind("pdf");
 
-        pdfUrl = await uploadCatalogMedia(
-          values.file,
-          "pdf",
-          setPdfProgress,
-        );
+        pdfUrl = await uploadCatalogMedia(values.file, "pdf", setPdfProgress);
       }
 
       setUploadingKind(null);
@@ -150,7 +162,9 @@ const EditCatalogForm = ({
       await updateCatalog(catalog.id, {
         title: values.title.trim(),
         description: values.description.trim(),
+        brand_id: values.brand_id,
         cover: coverUrl,
+        image: imageUrl,
         file: pdfUrl,
       });
 
@@ -160,7 +174,9 @@ const EditCatalogForm = ({
               ...previous,
               title: values.title.trim(),
               description: values.description.trim(),
+              brand_id: values.brand_id,
               cover: coverUrl ?? previous.cover,
+              image: imageUrl ?? previous.image,
               file: pdfUrl ?? previous.file,
             }
           : previous,
@@ -169,11 +185,14 @@ const EditCatalogForm = ({
       reset({
         title: values.title.trim(),
         description: values.description.trim(),
+        brand_id: values.brand_id,
         cover: undefined,
+        image: undefined,
         file: undefined,
       });
 
       setCoverProgress(0);
+      setImageProgress(0);
       setPdfProgress(0);
 
       toast.success("کاتالوگ با موفقیت ویرایش شد.");
@@ -183,9 +202,7 @@ const EditCatalogForm = ({
       console.error("UPDATE CATALOG ERROR:", error);
 
       toast.error(
-        error instanceof Error
-          ? error.message
-          : "ویرایش کاتالوگ ناموفق بود.",
+        error instanceof Error ? error.message : "ویرایش کاتالوگ ناموفق بود.",
       );
     } finally {
       setUploadingKind(null);
@@ -227,22 +244,17 @@ const EditCatalogForm = ({
       dir="rtl"
       className="border-border bg-background 3xl:grid-cols-[0.36fr_minmax(0,1fr)] flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border lg:grid lg:grid-cols-[0.26fr_minmax(0,1fr)] lg:grid-rows-[minmax(0,1fr)] xl:grid-cols-[0.32fr_minmax(0,1fr)] 2xl:grid-cols-[0.34fr_minmax(0,1fr)]"
     >
-      {/* Information */}
       <aside className="border-border bg-secondary-bg 3xl:p-7 border-b p-4 lg:border-e lg:border-b-0 xl:p-5 2xl:p-6">
         <h2 className="text-foreground 3xl:text-xl text-base font-semibold xl:text-lg">
           ویرایش کاتالوگ
         </h2>
 
         <p className="text-muted-foreground 3xl:text-sm 3xl:leading-7 mt-2 text-justify text-xs leading-6 xl:text-[13px]">
-          عنوان و توضیحات کاتالوگ را در صورت نیاز تغییر دهید.
-          برای جایگزینی کاور یا فایل PDF، فایل جدید انتخاب کنید.
-          اگر کاور یا PDF را تغییر ندهید، نسخه فعلی آن حفظ
-          خواهد شد. نیازی نیست برای ویرایش متن، فایل‌ها را
-          دوباره آپلود کنید.
+          عنوان، توضیحات و برند کاتالوگ را ویرایش کنید. برای جایگزینی کاور، بنر
+          یا PDF فایل جدید انتخاب کنید. فایل‌های تغییرنکرده حفظ می‌شوند.
         </p>
       </aside>
 
-      {/* Fields */}
       <div className="bg-background 3xl:p-8 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-4 xl:p-5 2xl:p-6">
         <ScrollArea
           data-lenis-prevent
@@ -251,7 +263,6 @@ const EditCatalogForm = ({
           scrollBarClassName="me-0"
         >
           <div className="3xl:gap-8 flex min-w-0 flex-col gap-5 pb-5 xl:gap-6 xl:pb-6">
-            {/* Title */}
             <FormField
               label="عنوان کاتالوگ"
               placeholder="عنوان کاتالوگ را وارد کنید"
@@ -262,7 +273,6 @@ const EditCatalogForm = ({
               dir="rtl"
             />
 
-            {/* Description */}
             <FormField
               label="توضیحات کاتالوگ"
               placeholder="توضیحات کاتالوگ را وارد کنید"
@@ -273,7 +283,19 @@ const EditCatalogForm = ({
               dir="rtl"
             />
 
-            {/* Cover */}
+            <Controller
+              control={control}
+              name="brand_id"
+              render={({ field }) => (
+                <CatalogBrandSelect
+                  value={field.value || null}
+                  onChange={(id) => field.onChange(id ?? 0)}
+                  error={errors.brand_id?.message}
+                  disabled={isSubmitting}
+                />
+              )}
+            />
+
             <Controller
               control={control}
               name="cover"
@@ -291,7 +313,23 @@ const EditCatalogForm = ({
               )}
             />
 
-            {/* PDF */}
+            <Controller
+              control={control}
+              name="image"
+              render={({ field }) => (
+                <EditCatalogMediaField
+                  kind="image"
+                  currentUrl={catalog.image}
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={errors.image?.message}
+                  progress={imageProgress}
+                  isUploading={uploadingKind === "image"}
+                  disabled={isSubmitting}
+                />
+              )}
+            />
+
             <Controller
               control={control}
               name="file"
@@ -311,7 +349,6 @@ const EditCatalogForm = ({
           </div>
         </ScrollArea>
 
-        {/* Submit */}
         <div className="border-border bg-background 3xl:pt-6 mt-4 flex shrink-0 justify-end border-t pt-4 xl:mt-5 xl:pt-5">
           <CustomButton
             type="submit"
@@ -321,13 +358,14 @@ const EditCatalogForm = ({
             loadingContent={
               <>
                 <LoaderCircle className="size-4 animate-spin" />
-
                 <span>
                   {uploadingKind === "cover"
                     ? "در حال آپلود کاور..."
-                    : uploadingKind === "pdf"
-                      ? "در حال آپلود PDF..."
-                      : "در حال ویرایش کاتالوگ..."}
+                    : uploadingKind === "image"
+                      ? "در حال آپلود بنر..."
+                      : uploadingKind === "pdf"
+                        ? "در حال آپلود PDF..."
+                        : "در حال ویرایش کاتالوگ..."}
                 </span>
               </>
             }

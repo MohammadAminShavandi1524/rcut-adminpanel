@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 
 import {
+  BadgeCheck,
+  BookOpen,
   Mail,
   Package,
-  PackageCheck,
-  ShoppingBag,
   Tags,
   type LucideIcon,
 } from "lucide-react";
@@ -38,10 +38,17 @@ const dashboardItems: DashboardItem[] = [
   },
   {
     key: "categories",
-    title: "دسته بندی‌ها",
+    title: "دسته‌بندی‌ها",
     href: "/categories",
     addHref: "/categories/add",
     icon: Tags,
+  },
+  {
+    key: "brands",
+    title: "برندها",
+    href: "/brands",
+    addHref: "/brands/add",
+    icon: BadgeCheck,
   },
   {
     key: "products",
@@ -51,16 +58,11 @@ const dashboardItems: DashboardItem[] = [
     icon: Package,
   },
   {
-    key: "newProducts",
-    title: "محصولات جدید",
-    href: "/products",
-    icon: ShoppingBag,
-  },
-  {
-    key: "topSellerProducts",
-    title: "محصولات پرفروش",
-    href: "/products",
-    icon: PackageCheck,
+    key: "catalogs",
+    title: "کاتالوگ‌ها",
+    href: "/catalogs",
+    addHref: "/catalogs/add",
+    icon: BookOpen,
   },
 ];
 

@@ -4,9 +4,11 @@ import { ExternalLink, FileText, ImageIcon } from "lucide-react";
 
 import CatalogUploadField from "../add-catalog/CatalogUploadField";
 
+import type { CatalogMediaKind } from "../add-catalog/add-catalog.api";
+
 interface Props {
-  kind: "cover" | "pdf";
-  currentUrl: string;
+  kind: CatalogMediaKind;
+  currentUrl: string | null;
   value?: File;
   onChange: (value?: File) => void;
   error?: string;
@@ -26,13 +28,20 @@ const EditCatalogMediaField = ({
   disabled = false,
 }: Props) => {
   const isCover = kind === "cover";
+  const isBanner = kind === "image";
+  const isImage = kind !== "pdf";
+
+  const title = isCover
+    ? "کاور فعلی کاتالوگ"
+    : isBanner
+      ? "بنر فعلی کاتالوگ"
+      : "فایل PDF فعلی";
 
   return (
     <div className="flex min-w-0 flex-col gap-4">
-      {/* Current uploaded media */}
       <div className="border-border bg-secondary-bg/25 min-w-0 rounded-xl border p-4">
         <div className="mb-3 flex items-center gap-2">
-          {isCover ? (
+          {isImage ? (
             <ImageIcon
               className="text-custom-primary size-4"
               strokeWidth={1.8}
@@ -44,18 +53,22 @@ const EditCatalogMediaField = ({
             />
           )}
 
-          <h3 className="text-foreground text-sm font-semibold">
-            {isCover ? "کاور فعلی کاتالوگ" : "فایل PDF فعلی"}
-          </h3>
+          <h3 className="text-foreground text-sm font-semibold">{title}</h3>
         </div>
 
-        {isCover ? (
+        {isImage ? (
           <div className="flex flex-wrap items-start gap-4">
-            <div className="border-border bg-background flex aspect-[3/4] w-28 shrink-0 items-center justify-center overflow-hidden rounded-md border sm:w-36">
+            <div
+              className={
+                isBanner
+                  ? "border-border bg-background flex aspect-[1280/772] w-48 shrink-0 items-center justify-center overflow-hidden rounded-md border sm:w-60"
+                  : "border-border bg-background flex aspect-[3/4] w-28 shrink-0 items-center justify-center overflow-hidden rounded-md border sm:w-36"
+              }
+            >
               {currentUrl ? (
                 <img
                   src={currentUrl}
-                  alt="کاور فعلی کاتالوگ"
+                  alt={title}
                   className="size-full object-contain"
                 />
               ) : (
@@ -68,8 +81,7 @@ const EditCatalogMediaField = ({
 
             <div className="flex min-w-0 flex-col gap-3">
               <p className="text-muted-foreground text-xs leading-6">
-                اگر تصویر جدیدی انتخاب نکنید، همین کاور حفظ
-                می‌شود.
+                اگر تصویر جدیدی انتخاب نکنید، تصویر فعلی حفظ می‌شود.
               </p>
 
               {currentUrl && (
@@ -88,8 +100,7 @@ const EditCatalogMediaField = ({
         ) : (
           <div className="flex min-w-0 flex-col gap-3">
             <p className="text-muted-foreground text-xs leading-6">
-              اگر فایل PDF جدیدی انتخاب نکنید، فایل فعلی حفظ
-              می‌شود.
+              اگر فایل PDF جدیدی انتخاب نکنید، فایل فعلی حفظ می‌شود.
             </p>
 
             {currentUrl ? (
@@ -111,7 +122,6 @@ const EditCatalogMediaField = ({
         )}
       </div>
 
-      {/* Replacement media */}
       <CatalogUploadField
         kind={kind}
         value={value}
@@ -126,7 +136,9 @@ const EditCatalogMediaField = ({
         <p className="text-custom-primary px-1 text-xs">
           {isCover
             ? "کاور جدید جایگزین کاور فعلی خواهد شد."
-            : "PDF جدید جایگزین فایل فعلی خواهد شد."}
+            : isBanner
+              ? "بنر جدید جایگزین بنر فعلی خواهد شد."
+              : "PDF جدید جایگزین فایل فعلی خواهد شد."}
         </p>
       )}
     </div>

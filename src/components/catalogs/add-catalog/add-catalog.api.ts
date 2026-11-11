@@ -1,9 +1,13 @@
 export interface CreateCatalogPayload {
   title: string;
   description: string;
+  image: string;
+  brand_id: number;
   cover: string;
   file: string;
 }
+
+export type CatalogMediaKind = "cover" | "image" | "pdf";
 
 interface UploadResponse {
   success?: boolean;
@@ -22,7 +26,9 @@ async function parseResponse(response: Response) {
     throw new Error(
       typeof detail === "string"
         ? detail
-        : "ثبت کاتالوگ ناموفق بود.",
+        : typeof detail?.detail === "string"
+          ? detail.detail
+          : "ثبت کاتالوگ ناموفق بود.",
     );
   }
 
@@ -43,7 +49,7 @@ export async function createCatalog(payload: CreateCatalogPayload) {
 
 export function uploadCatalogMedia(
   file: File,
-  kind: "cover" | "pdf",
+  kind: CatalogMediaKind,
   onProgress?: (percentage: number) => void,
 ): Promise<string> {
   const form = new FormData();
@@ -59,9 +65,7 @@ export function uploadCatalogMedia(
 
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable) {
-        onProgress?.(
-          Math.round((event.loaded / event.total) * 100),
-        );
+        onProgress?.(Math.round((event.loaded / event.total) * 100));
       }
     };
 
@@ -93,9 +97,7 @@ export function uploadCatalogMedia(
         !data.url
       ) {
         const message =
-          data?.message ||
-          data?.detail ||
-          "آپلود فایل ناموفق بود.";
+          data?.message || data?.detail || "آپلود فایل ناموفق بود.";
 
         const code = data?.code ? ` (${data.code})` : "";
 

@@ -16,11 +16,12 @@ import { cn } from "@/lib/utils";
 import {
   CATALOG_IMAGE_TYPES,
   MAX_CATALOG_COVER_SIZE,
-
 } from "./add-catalog.schema";
 
+import type { CatalogMediaKind } from "./add-catalog.api";
+
 interface Props {
-  kind: "cover" | "pdf";
+  kind: CatalogMediaKind;
   value?: File;
   onChange: (value?: File) => void;
   error?: string;
@@ -39,13 +40,23 @@ const CatalogUploadField = ({
   disabled = false,
 }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
+
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
   const [fileError, setFileError] = useState("");
 
   const isCover = kind === "cover";
+  const isBanner = kind === "image";
+  const isImage = kind !== "pdf";
+
+  const label = isCover
+    ? "تصویر کاور کاتالوگ"
+    : isBanner
+      ? "تصویر بنر کاتالوگ"
+      : "فایل PDF کاتالوگ";
 
   useEffect(() => {
-    if (!isCover || !value) {
+    if (!isImage || !value) {
       setPreviewUrl(null);
       return;
     }
@@ -57,22 +68,19 @@ const CatalogUploadField = ({
     return () => {
       URL.revokeObjectURL(url);
     };
-  }, [isCover, value]);
+  }, [isImage, value]);
 
   const handleFile = (file?: File) => {
     if (!file || disabled) return;
 
-    if (isCover) {
+    if (isImage) {
       if (!CATALOG_IMAGE_TYPES.includes(file.type)) {
         setFileError("فرمت مجاز JPG، PNG یا WEBP است.");
         return;
       }
 
-      if (
-        file.size === 0 ||
-        file.size > MAX_CATALOG_COVER_SIZE
-      ) {
-        setFileError("حداکثر حجم کاور ۵ مگابایت است.");
+      if (file.size === 0 || file.size > MAX_CATALOG_COVER_SIZE) {
+        setFileError("حداکثر حجم تصویر ۵ مگابایت است.");
         return;
       }
     } else {
@@ -94,9 +102,7 @@ const CatalogUploadField = ({
     onChange(file);
   };
 
-  const handleInputChange = (
-    event: ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     handleFile(event.target.files?.[0]);
     event.target.value = "";
   };
@@ -106,9 +112,7 @@ const CatalogUploadField = ({
     handleFile(event.dataTransfer.files?.[0]);
   };
 
-  const handleKeyDown = (
-    event: KeyboardEvent<HTMLDivElement>,
-  ) => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (disabled) return;
 
     if (event.key === "Enter" || event.key === " ") {
@@ -124,19 +128,13 @@ const CatalogUploadField = ({
     setFileError("");
   };
 
-  const label = isCover ? "تصویر کاور کاتالوگ" : "فایل PDF کاتالوگ";
-
   return (
     <div className="min-w-0">
       <div className="mb-2 flex items-center justify-between gap-3 px-1">
-        <label className="text-foreground text-sm font-semibold">
-          {label}
-        </label>
+        <label className="text-foreground text-sm font-semibold">{label}</label>
 
         {(fileError || error) && (
-          <span className="text-destructive text-xs">
-            {fileError || error}
-          </span>
+          <span className="text-destructive text-xs">{fileError || error}</span>
         )}
       </div>
 
@@ -144,9 +142,7 @@ const CatalogUploadField = ({
         ref={inputRef}
         type="file"
         accept={
-          isCover
-            ? "image/jpeg,image/png,image/webp"
-            : ".pdf,application/pdf"
+          isImage ? "image/jpeg,image/png,image/webp" : ".pdf,application/pdf"
         }
         disabled={disabled}
         onChange={handleInputChange}
@@ -168,22 +164,24 @@ const CatalogUploadField = ({
           onDragOver={(event) => event.preventDefault()}
           onDrop={handleDrop}
           className={cn(
-            "border-border bg-secondary-bg/30 hover:border-custom-primary/70 relative flex w-full max-w-[280px] cursor-pointer items-center justify-center overflow-hidden rounded-xl border border-dashed transition-colors",
+            "border-border bg-secondary-bg/30 hover:border-custom-primary/70 relative flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border border-dashed transition-colors",
             isCover
-              ? "aspect-[3/4]"
-              : "aspect-[4/3] max-h-[230px]",
+              ? "aspect-[3/4] max-w-[280px]"
+              : isBanner
+                ? "aspect-[1280/772] max-w-[360px]"
+                : "aspect-[4/3] max-h-[230px] max-w-[280px]",
             disabled && "cursor-not-allowed opacity-60",
           )}
         >
-          {isCover && previewUrl ? (
+          {isImage && previewUrl ? (
             <img
               src={previewUrl}
-              alt="پیش‌نمایش کاور کاتالوگ"
+              alt={`پیش‌نمایش ${label}`}
               className="absolute inset-0 size-full object-contain"
             />
           ) : (
             <div className="flex flex-col items-center justify-center gap-3 p-4 text-center">
-              {isCover ? (
+              {isImage ? (
                 <UploadCloud
                   className="text-custom-primary size-9"
                   strokeWidth={1.5}
@@ -196,17 +194,19 @@ const CatalogUploadField = ({
               )}
 
               <span className="text-foreground text-sm font-medium">
-                {value && !isCover
+                {value && !isImage
                   ? "فایل PDF انتخاب شد"
                   : "انتخاب یا رها کردن فایل"}
               </span>
 
               <span className="text-muted-foreground max-w-full truncate text-xs">
-                {value && !isCover
+                {value && !isImage
                   ? value.name
                   : isCover
-                    ? "تصویر صفحه اول کاتالوگ"
-                    : "فایل با فرمت PDF"}
+                    ? "تصویر کاور کاتالوگ"
+                    : isBanner
+                      ? "تصویر بنر افقی"
+                      : "فایل با فرمت PDF"}
               </span>
             </div>
           )}
@@ -230,17 +230,21 @@ const CatalogUploadField = ({
           <h3 className="text-foreground text-sm font-semibold">
             {isCover
               ? "راهنمای تصویر کاور"
-              : "راهنمای فایل PDF"}
+              : isBanner
+                ? "راهنمای تصویر بنر"
+                : "راهنمای فایل PDF"}
           </h3>
 
           <p className="text-muted-foreground mt-2 text-xs leading-6">
             {isCover
-              ? "بهتر است تصویر کاور دقیقاً هم‌نسبت با صفحه اول فایل PDF باشد. پیش‌نمایش تصویر بدون برش است."
-              : "نسخه کامل کاتالوگ را به صورت فایل PDF بارگذاری کنید."}
+              ? "بهتر است تصویر کاور متناسب با صفحه اول PDF باشد."
+              : isBanner
+                ? "تصویر بنر بهتر است افقی و با نسبت تقریبی ۱۲۸۰ در ۷۷۲ باشد. پیش‌نمایش بدون برش نمایش داده می‌شود."
+                : "نسخه کامل کاتالوگ را به صورت PDF بارگذاری کنید."}
           </p>
 
           <p className="text-muted-foreground mt-3 text-xs">
-            {isCover
+            {isImage
               ? "فرمت: JPG، PNG، WEBP — حداکثر ۵ مگابایت"
               : "فرمت مجاز: PDF"}
           </p>
@@ -250,8 +254,7 @@ const CatalogUploadField = ({
               className="text-foreground mt-3 w-full truncate text-xs"
               title={value.name}
             >
-              {value.name} (
-              {(value.size / 1024 / 1024).toFixed(2)} MB)
+              {value.name} ({(value.size / 1024 / 1024).toFixed(2)} MB)
             </p>
           )}
 
@@ -270,7 +273,9 @@ const CatalogUploadField = ({
               <div className="bg-border h-1.5 w-full overflow-hidden rounded-full">
                 <div
                   className="bg-custom-primary h-full transition-[width]"
-                  style={{ width: `${progress}%` }}
+                  style={{
+                    width: `${progress}%`,
+                  }}
                 />
               </div>
             </div>
