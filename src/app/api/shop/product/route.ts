@@ -8,7 +8,7 @@ const payloadSchema = z.object({
   description: z.string().trim().min(1),
   image: z.url(),
   category_id: z.number().int().positive(),
-  brand_id: z.number().int().positive().nullable(),
+  brand_id: z.number().int().positive(),
 });
 
 function handleApiError(error: unknown) {

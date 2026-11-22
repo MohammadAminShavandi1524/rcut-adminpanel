@@ -14,10 +14,7 @@ import {
 
 import { cn } from "@/lib/utils";
 
-import {
-  CustomButton,
-  CustomHoldButton,
-} from "@/components/ui/custom-button";
+import { CustomButton, CustomHoldButton } from "@/components/ui/custom-button";
 
 import { useCustomToast } from "@/components/ui/custom-toast";
 
@@ -32,10 +29,7 @@ interface Props {
   isFirst: boolean;
   isLast: boolean;
   onDelete: (id: number) => Promise<void>;
-  onOrder: (
-    id: number,
-    action: "increase" | "decrease",
-  ) => Promise<void>;
+  onOrder: (id: number, action: "increase" | "decrease") => Promise<void>;
 }
 
 const CatalogRow = ({
@@ -72,9 +66,7 @@ const CatalogRow = ({
   const orderButtonClass =
     "border-border text-muted-foreground hover:border-custom-primary/45 hover:bg-custom-primary/6 hover:text-custom-primary 3xl:size-10 flex size-8 cursor-pointer items-center justify-center rounded-lg border transition-[background-color,border-color,color] duration-200 disabled:cursor-not-allowed disabled:opacity-50 xl:size-9 2xl:size-9.5";
 
-  const handleOrder = async (
-    action: "increase" | "decrease",
-  ) => {
+  const handleOrder = async (action: "increase" | "decrease") => {
     if (busy) return;
 
     setBusy(true);
@@ -137,31 +129,32 @@ const CatalogRow = ({
           </p>
         </div>
 
-        {/* Cover */}
+        {/* Catalog Banner */}
         <div className="flex min-w-0 items-center">
-          {catalog.cover ? (
+          {catalog.image ? (
             <button
               type="button"
               onClick={() => setDetailsOpen(true)}
               aria-label={`مشاهده جزئیات ${catalog.title}`}
-              className="group/image border-border bg-secondary-bg 3xl:h-[70px] 3xl:w-[55px] relative block h-12 w-10 shrink-0 cursor-pointer overflow-hidden rounded-md border xl:h-14 xl:w-11 2xl:h-16 2xl:w-12"
+              className="group/image border-border bg-secondary-bg 3xl:w-[96px] relative block aspect-[1280/772] w-16 max-w-full shrink-0 cursor-pointer overflow-hidden rounded-md border xl:w-[76px] 2xl:w-[86px]"
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={catalog.cover}
-                alt={catalog.title}
+                src={catalog.image}
+                alt={`بنر ${catalog.title}`}
                 loading="lazy"
                 className="size-full object-contain"
               />
 
               <span className="absolute inset-0 flex items-center justify-center bg-black/45 opacity-0 transition-opacity duration-200 group-hover/image:opacity-100">
-                <Eye
-                  className="size-5 text-white"
-                  strokeWidth={1.8}
-                />
+                <Eye className="size-5 text-white" strokeWidth={1.8} />
               </span>
             </button>
           ) : (
-            <div className="border-border bg-secondary-bg 3xl:h-[70px] 3xl:w-[55px] flex h-12 w-10 shrink-0 items-center justify-center rounded-md border xl:h-14 xl:w-11 2xl:h-16 2xl:w-12">
+            <div
+              className="border-border bg-secondary-bg 3xl:w-[96px] flex aspect-[1280/772] w-16 max-w-full shrink-0 items-center justify-center rounded-md border xl:w-[76px] 2xl:w-[86px]"
+              title="بنری برای این کاتالوگ ثبت نشده است"
+            >
               <ImageIcon
                 className="text-muted-foreground size-5"
                 strokeWidth={1.6}
@@ -211,9 +204,7 @@ const CatalogRow = ({
             variant="outline"
             disabled={busy}
             onClick={() => setDetailsOpen(true)}
-            leftSection={
-              <Eye className="size-3 xl:size-4" strokeWidth={1.7} />
-            }
+            leftSection={<Eye className="size-3 xl:size-4" strokeWidth={1.7} />}
             className={buttonClass}
           >
             جزئیات

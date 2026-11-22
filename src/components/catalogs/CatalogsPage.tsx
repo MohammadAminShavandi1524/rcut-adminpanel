@@ -1,21 +1,10 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
-import {
-  BookOpen,
-  LoaderCircle,
-  Plus,
-  Search,
-} from "lucide-react";
+import { BookOpen, LoaderCircle, Plus, Search } from "lucide-react";
 
 import HeaderLayout from "@/components/Layout/HeaderLayout";
 
@@ -62,9 +51,7 @@ const CatalogsPage = () => {
       throw new Error("ساختار اطلاعات کاتالوگ‌ها معتبر نیست.");
     }
 
-    setCatalogs(
-      [...data].sort((a, b) => a.index - b.index),
-    );
+    setCatalogs([...data].sort((a, b) => a.index - b.index));
 
     setError(false);
   }, []);
@@ -103,9 +90,7 @@ const CatalogsPage = () => {
   const handleDelete = async (id: number) => {
     await deleteCatalog(id);
 
-    setCatalogs((previous) =>
-      previous.filter((catalog) => catalog.id !== id),
-    );
+    setCatalogs((previous) => previous.filter((catalog) => catalog.id !== id));
 
     toast.success("کاتالوگ با موفقیت حذف شد.");
 
@@ -117,10 +102,7 @@ const CatalogsPage = () => {
     }
   };
 
-  const handleOrder = async (
-    id: number,
-    action: "increase" | "decrease",
-  ) => {
+  const handleOrder = async (id: number, action: "increase" | "decrease") => {
     if (orderingRef.current) return;
 
     orderingRef.current = true;
@@ -227,10 +209,10 @@ const CatalogsPage = () => {
                       <div>ترتیب</div>
                       <div>عنوان کاتالوگ</div>
                       <div>توضیحات</div>
-                      <div>کاور</div>
-                      <div className="hidden 2xl:block">
-                        تاریخ ثبت
-                      </div>
+                      <div>تصویر بنر</div>
+
+                      <div className="hidden 2xl:block">تاریخ ثبت</div>
+
                       <div className="text-center">عملیات</div>
                     </div>
                   </div>
@@ -250,8 +232,7 @@ const CatalogsPage = () => {
                             animationIndex={index}
                             isFirst={catalogs[0]?.id === catalog.id}
                             isLast={
-                              catalogs[catalogs.length - 1]?.id ===
-                              catalog.id
+                              catalogs[catalogs.length - 1]?.id === catalog.id
                             }
                             onDelete={handleDelete}
                             onOrder={handleOrder}

@@ -47,7 +47,7 @@ const AddProductForm = () => {
       name: "",
       description: "",
       category_id: 0,
-      brand_id: null,
+      brand_id: 0,
       image: undefined,
     },
   });
@@ -76,7 +76,7 @@ const AddProductForm = () => {
         name: "",
         description: "",
         category_id: 0,
-        brand_id: null,
+        brand_id: 0,
         image: undefined,
       });
 
@@ -108,9 +108,9 @@ const AddProductForm = () => {
         </h2>
 
         <p className="text-muted-foreground 3xl:text-sm 3xl:leading-7 mt-2 text-justify text-xs leading-6 xl:text-[13px]">
-          ابتدا دسته بندی نهایی را انتخاب کنید. انتخاب برند اختیاری است. سپس
-          نام، توضیحات و تصویر محصول را وارد کنید. پس از آپلود تصویر، محصول در
-          فروشگاه ثبت می‌شود.
+          ابتدا دسته بندی نهایی و برند محصول را انتخاب کنید. سپس نام، توضیحات و
+          تصویر محصول را وارد کنید. پس از آپلود تصویر، محصول در فروشگاه ثبت
+          می‌شود.
         </p>
       </aside>
 
@@ -137,14 +137,14 @@ const AddProductForm = () => {
               />
             </div>
 
-            {/* Brand - Optional */}
+            {/* Brand - Required */}
             <div className="add-product-field min-w-0">
               <Controller
                 control={control}
                 name="brand_id"
                 render={({ field }) => (
                   <ProductBrandSelect
-                    value={field.value}
+                    value={field.value || null}
                     onChange={field.onChange}
                     error={errors.brand_id?.message}
                     disabled={isSubmitting}

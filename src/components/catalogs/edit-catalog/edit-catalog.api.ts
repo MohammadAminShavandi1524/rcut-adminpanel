@@ -6,7 +6,6 @@ export interface UpdateCatalogPayload {
   title: string;
   description: string;
   brand_id: number;
-  cover: string | null;
   image: string | null;
   file: string | null;
 }
@@ -119,7 +118,6 @@ export const getCatalogForEdit = async (id: number): Promise<Catalog> => {
         : "",
     brand_id: brandId,
     image: typeof catalogData.image === "string" ? catalogData.image : null,
-    cover: typeof catalogData.cover === "string" ? catalogData.cover : "",
     file: typeof catalogData.file === "string" ? catalogData.file : "",
     index: typeof catalogData.index === "number" ? catalogData.index : 0,
     created: typeof catalogData.created === "string" ? catalogData.created : "",

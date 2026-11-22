@@ -1,7 +1,4 @@
-import {
-  PutObjectCommand,
-  S3Client,
-} from "@aws-sdk/client-s3";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
@@ -37,22 +34,17 @@ export async function POST(request: Request) {
       "ARVAN_BUCKET_URL",
     ] as const;
 
-    const missingVariables =
-      requiredVariables.filter(
-        (key) => !process.env[key]?.trim(),
-      );
+    const missingVariables = requiredVariables.filter(
+      (key) => !process.env[key]?.trim(),
+    );
 
     if (missingVariables.length > 0) {
-      console.error(
-        "CATALOG STORAGE CONFIG ERROR:",
-        missingVariables,
-      );
+      console.error("CATALOG STORAGE CONFIG ERROR:", missingVariables);
 
       return NextResponse.json(
         {
           success: false,
-          message:
-            "تنظیمات فضای ذخیره‌سازی کامل نیست.",
+          message: "تنظیمات فضای ذخیره‌سازی کامل نیست.",
           code: "STORAGE_CONFIG_MISSING",
         },
         { status: 500 },
@@ -64,11 +56,7 @@ export async function POST(request: Request) {
     const file = formData.get("file");
     const kind = formData.get("kind");
 
-    if (
-      kind !== "cover" &&
-      kind !== "image" &&
-      kind !== "pdf"
-    ) {
+    if (kind !== "image" && kind !== "pdf") {
       return NextResponse.json(
         {
           success: false,
@@ -92,30 +80,24 @@ export async function POST(request: Request) {
     let contentType: string;
     let objectFolder: string;
 
-    if (kind === "cover" || kind === "image") {
-      const imageExtension =
-        IMAGE_TYPES.get(file.type);
+    if (kind === "image") {
+      const imageExtension = IMAGE_TYPES.get(file.type);
 
       if (!imageExtension) {
         return NextResponse.json(
           {
             success: false,
-            message:
-              "فرمت تصویر باید JPG، PNG یا WEBP باشد.",
+            message: "فرمت تصویر باید JPG، PNG یا WEBP باشد.",
           },
           { status: 400 },
         );
       }
 
-      if (
-        file.size === 0 ||
-        file.size > MAX_IMAGE_SIZE
-      ) {
+      if (file.size === 0 || file.size > MAX_IMAGE_SIZE) {
         return NextResponse.json(
           {
             success: false,
-            message:
-              "حداکثر حجم تصویر ۵ مگابایت است.",
+            message: "حداکثر حجم تصویر ۵ مگابایت است.",
           },
           { status: 400 },
         );
@@ -123,17 +105,11 @@ export async function POST(request: Request) {
 
       extension = imageExtension;
       contentType = file.type;
-
-      objectFolder =
-        kind === "image"
-          ? "catalogs/images"
-          : "catalogs/covers";
+      objectFolder = "catalogs/images";
     } else {
       if (
         !file.name.toLowerCase().endsWith(".pdf") ||
-        !["application/pdf", ""].includes(
-          file.type,
-        )
+        !["application/pdf", ""].includes(file.type)
       ) {
         return NextResponse.json(
           {
@@ -148,8 +124,7 @@ export async function POST(request: Request) {
         return NextResponse.json(
           {
             success: false,
-            message:
-              "فایل PDF نباید خالی باشد.",
+            message: "فایل PDF نباید خالی باشد.",
           },
           { status: 400 },
         );
@@ -168,15 +143,12 @@ export async function POST(request: Request) {
       endpoint: process.env.ARVAN_ENDPOINT!,
       forcePathStyle: true,
       credentials: {
-        accessKeyId:
-          process.env.ARVAN_ACCESS_KEY!,
-        secretAccessKey:
-          process.env.ARVAN_SECRET_KEY!,
+        accessKeyId: process.env.ARVAN_ACCESS_KEY!,
+        secretAccessKey: process.env.ARVAN_SECRET_KEY!,
       },
     });
 
-    const objectKey =
-      `${objectFolder}/${crypto.randomUUID()}.${extension}`;
+    const objectKey = `${objectFolder}/${crypto.randomUUID()}.${extension}`;
 
     await s3.send(
       new PutObjectCommand({
@@ -189,9 +161,7 @@ export async function POST(request: Request) {
       }),
     );
 
-    const baseUrl =
-      process.env.ARVAN_BUCKET_URL!
-        .replace(/\/$/, "");
+    const baseUrl = process.env.ARVAN_BUCKET_URL!.replace(/\/$/, "");
 
     return NextResponse.json({
       success: true,
@@ -204,24 +174,17 @@ export async function POST(request: Request) {
       Code?: string;
     };
 
-    console.error(
-      "CATALOG UPLOAD ERROR:",
-      {
-        name: uploadError?.name,
-        message: uploadError?.message,
-        code: uploadError?.Code,
-      },
-    );
+    console.error("CATALOG UPLOAD ERROR:", {
+      name: uploadError?.name,
+      message: uploadError?.message,
+      code: uploadError?.Code,
+    });
 
     return NextResponse.json(
       {
         success: false,
-        message:
-          "آپلود فایل کاتالوگ ناموفق بود.",
-        code:
-          uploadError?.Code ||
-          uploadError?.name ||
-          "UPLOAD_FAILED",
+        message: "آپلود فایل کاتالوگ ناموفق بود.",
+        code: uploadError?.Code || uploadError?.name || "UPLOAD_FAILED",
       },
       { status: 500 },
     );

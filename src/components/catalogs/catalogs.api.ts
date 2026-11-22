@@ -4,7 +4,6 @@ export interface Catalog {
   description: string;
   image: string | null;
   brand_id: number;
-  cover: string;
   file: string;
   index: number;
   created: string;

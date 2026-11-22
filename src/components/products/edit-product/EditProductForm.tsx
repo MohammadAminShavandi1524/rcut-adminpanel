@@ -59,7 +59,7 @@ const EditProductForm = ({ productId }: EditProductFormProps) => {
     defaultValues: {
       name: "",
       description: "",
-      brand_id: null,
+      brand_id: 0,
       image: undefined,
       new: false,
       top_seller: false,
@@ -83,7 +83,7 @@ const EditProductForm = ({ productId }: EditProductFormProps) => {
         reset({
           name: data.name,
           description: data.description,
-          brand_id: data.brand?.id ?? null,
+          brand_id: data.brand?.id ?? 0,
           image: undefined,
           new: data.new,
           top_seller: data.top_seller,
@@ -117,11 +117,6 @@ const EditProductForm = ({ productId }: EditProductFormProps) => {
   const onSubmit = async (values: EditProductValues) => {
     if (!product) return;
 
-    if (product.brand && values.brand_id === null) {
-      toast.error("حذف برند از محصول دارای برند امکان‌پذیر نیست.");
-      return;
-    }
-
     try {
       setUploadProgress(0);
 
@@ -149,11 +144,7 @@ const EditProductForm = ({ productId }: EditProductFormProps) => {
         if (!previous) return previous;
 
         const nextBrand =
-          values.brand_id === null
-            ? null
-            : previous.brand?.id === values.brand_id
-              ? previous.brand
-              : null;
+          previous.brand?.id === values.brand_id ? previous.brand : null;
 
         return {
           ...previous,
@@ -237,11 +228,11 @@ const EditProductForm = ({ productId }: EditProductFormProps) => {
         </h2>
 
         <p className="text-muted-foreground 3xl:text-sm 3xl:leading-7 mt-2 text-justify text-xs leading-6 xl:text-[13px]">
-          نام، توضیحات، برند و وضعیت محصول را در صورت نیاز ویرایش کنید. محصول
-          بدون برند می‌تواند برند دریافت کند و برند محصول دارای برند قابل تغییر
-          است، اما حذف برند آن امکان‌پذیر نیست. برای تغییر تصویر، تصویر جدیدی
-          انتخاب کنید. اگر تصویر را تغییر ندهید، تصویر فعلی حفظ می‌شود. دسته
-          بندی محصول قابل تغییر نیست.
+          نام، توضیحات، برند و وضعیت محصول را در صورت نیاز ویرایش کنید. انتخاب
+          برند برای ذخیره تغییرات الزامی است. اگر محصول قبلاً برندی نداشته، باید
+          برای آن برند انتخاب کنید. برای تغییر تصویر، تصویر جدیدی انتخاب کنید.
+          اگر تصویر را تغییر ندهید، تصویر فعلی حفظ می‌شود. دسته بندی محصول قابل
+          تغییر نیست.
         </p>
       </aside>
 
@@ -270,17 +261,16 @@ const EditProductForm = ({ productId }: EditProductFormProps) => {
               </div>
             </div>
 
-            {/* Brand - Editable */}
+            {/* Brand - Required */}
             <Controller
               control={control}
               name="brand_id"
               render={({ field }) => (
                 <ProductBrandSelect
-                  value={field.value}
+                  value={field.value || null}
                   onChange={field.onChange}
                   error={errors.brand_id?.message}
                   disabled={isSubmitting}
-                  allowNoBrand={product.brand === null}
                 />
               )}
             />
