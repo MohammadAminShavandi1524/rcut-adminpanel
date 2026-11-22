@@ -45,15 +45,9 @@ const CatalogUploadField = ({
 
   const [fileError, setFileError] = useState("");
 
-  const isCover = kind === "cover";
-  const isBanner = kind === "image";
-  const isImage = kind !== "pdf";
+  const isImage = kind === "image";
 
-  const label = isCover
-    ? "تصویر کاور کاتالوگ"
-    : isBanner
-      ? "تصویر بنر کاتالوگ"
-      : "فایل PDF کاتالوگ";
+  const label = isImage ? "تصویر بنر کاتالوگ (اختیاری)" : "فایل PDF کاتالوگ";
 
   useEffect(() => {
     if (!isImage || !value) {
@@ -165,15 +159,14 @@ const CatalogUploadField = ({
           onDrop={handleDrop}
           className={cn(
             "border-border bg-secondary-bg/30 hover:border-custom-primary/70 relative flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border border-dashed transition-colors",
-            isCover
-              ? "aspect-[3/4] max-w-[280px]"
-              : isBanner
-                ? "aspect-[1280/772] max-w-[360px]"
-                : "aspect-[4/3] max-h-[230px] max-w-[280px]",
+            isImage
+              ? "aspect-[1280/772] max-w-[360px]"
+              : "aspect-[4/3] max-h-[230px] max-w-[280px]",
             disabled && "cursor-not-allowed opacity-60",
           )}
         >
           {isImage && previewUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={previewUrl}
               alt={`پیش‌نمایش ${label}`}
@@ -202,11 +195,9 @@ const CatalogUploadField = ({
               <span className="text-muted-foreground max-w-full truncate text-xs">
                 {value && !isImage
                   ? value.name
-                  : isCover
-                    ? "تصویر کاور کاتالوگ"
-                    : isBanner
-                      ? "تصویر بنر افقی"
-                      : "فایل با فرمت PDF"}
+                  : isImage
+                    ? "تصویر بنر افقی (اختیاری)"
+                    : "فایل با فرمت PDF"}
               </span>
             </div>
           )}
@@ -228,19 +219,13 @@ const CatalogUploadField = ({
 
         <div className="border-border bg-secondary-bg/25 flex h-full min-h-[180px] min-w-0 flex-col items-center justify-center rounded-xl border p-4 text-center">
           <h3 className="text-foreground text-sm font-semibold">
-            {isCover
-              ? "راهنمای تصویر کاور"
-              : isBanner
-                ? "راهنمای تصویر بنر"
-                : "راهنمای فایل PDF"}
+            {isImage ? "راهنمای تصویر بنر" : "راهنمای فایل PDF"}
           </h3>
 
           <p className="text-muted-foreground mt-2 text-xs leading-6">
-            {isCover
-              ? "بهتر است تصویر کاور متناسب با صفحه اول PDF باشد."
-              : isBanner
-                ? "تصویر بنر بهتر است افقی و با نسبت تقریبی ۱۲۸۰ در ۷۷۲ باشد. پیش‌نمایش بدون برش نمایش داده می‌شود."
-                : "نسخه کامل کاتالوگ را به صورت PDF بارگذاری کنید."}
+            {isImage
+              ? "تصویر بنر اختیاری است. بهتر است تصویر افقی و با نسبت تقریبی ۱۲۸۰ در ۷۷۲ باشد. پیش‌نمایش بدون برش نمایش داده می‌شود."
+              : "نسخه کامل کاتالوگ را به صورت PDF بارگذاری کنید."}
           </p>
 
           <p className="text-muted-foreground mt-3 text-xs">

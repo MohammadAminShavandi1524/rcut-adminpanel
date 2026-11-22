@@ -49,7 +49,6 @@ const EditCatalogForm = ({ catalogId }: EditCatalogFormProps) => {
     null,
   );
 
-  const [coverProgress, setCoverProgress] = useState(0);
   const [imageProgress, setImageProgress] = useState(0);
   const [pdfProgress, setPdfProgress] = useState(0);
 
@@ -65,7 +64,6 @@ const EditCatalogForm = ({ catalogId }: EditCatalogFormProps) => {
       title: "",
       description: "",
       brand_id: 0,
-      cover: undefined,
       image: undefined,
       file: undefined,
     },
@@ -89,7 +87,6 @@ const EditCatalogForm = ({ catalogId }: EditCatalogFormProps) => {
           title: data.title,
           description: data.description,
           brand_id: data.brand_id,
-          cover: undefined,
           image: undefined,
           file: undefined,
         });
@@ -123,23 +120,11 @@ const EditCatalogForm = ({ catalogId }: EditCatalogFormProps) => {
     if (!catalog) return;
 
     try {
-      setCoverProgress(0);
       setImageProgress(0);
       setPdfProgress(0);
 
-      let coverUrl: string | null = null;
-      let imageUrl: string | null = null;
+      let imageUrl: string | null = catalog.image;
       let pdfUrl: string | null = null;
-
-      if (values.cover) {
-        setUploadingKind("cover");
-
-        coverUrl = await uploadCatalogMedia(
-          values.cover,
-          "cover",
-          setCoverProgress,
-        );
-      }
 
       if (values.image) {
         setUploadingKind("image");
@@ -163,7 +148,6 @@ const EditCatalogForm = ({ catalogId }: EditCatalogFormProps) => {
         title: values.title.trim(),
         description: values.description.trim(),
         brand_id: values.brand_id,
-        cover: coverUrl,
         image: imageUrl,
         file: pdfUrl,
       });
@@ -175,8 +159,7 @@ const EditCatalogForm = ({ catalogId }: EditCatalogFormProps) => {
               title: values.title.trim(),
               description: values.description.trim(),
               brand_id: values.brand_id,
-              cover: coverUrl ?? previous.cover,
-              image: imageUrl ?? previous.image,
+              image: imageUrl,
               file: pdfUrl ?? previous.file,
             }
           : previous,
@@ -186,12 +169,10 @@ const EditCatalogForm = ({ catalogId }: EditCatalogFormProps) => {
         title: values.title.trim(),
         description: values.description.trim(),
         brand_id: values.brand_id,
-        cover: undefined,
         image: undefined,
         file: undefined,
       });
 
-      setCoverProgress(0);
       setImageProgress(0);
       setPdfProgress(0);
 
@@ -250,8 +231,9 @@ const EditCatalogForm = ({ catalogId }: EditCatalogFormProps) => {
         </h2>
 
         <p className="text-muted-foreground 3xl:text-sm 3xl:leading-7 mt-2 text-justify text-xs leading-6 xl:text-[13px]">
-          عنوان، توضیحات و برند کاتالوگ را ویرایش کنید. برای جایگزینی کاور، بنر
-          یا PDF فایل جدید انتخاب کنید. فایل‌های تغییرنکرده حفظ می‌شوند.
+          عنوان، توضیحات و برند کاتالوگ را ویرایش کنید. تصویر بنر اختیاری است.
+          برای جایگزینی بنر یا PDF فایل جدید انتخاب کنید. فایل‌های تغییرنکرده
+          حفظ می‌شوند.
         </p>
       </aside>
 
@@ -291,23 +273,6 @@ const EditCatalogForm = ({ catalogId }: EditCatalogFormProps) => {
                   value={field.value || null}
                   onChange={(id) => field.onChange(id ?? 0)}
                   error={errors.brand_id?.message}
-                  disabled={isSubmitting}
-                />
-              )}
-            />
-
-            <Controller
-              control={control}
-              name="cover"
-              render={({ field }) => (
-                <EditCatalogMediaField
-                  kind="cover"
-                  currentUrl={catalog.cover}
-                  value={field.value}
-                  onChange={field.onChange}
-                  error={errors.cover?.message}
-                  progress={coverProgress}
-                  isUploading={uploadingKind === "cover"}
                   disabled={isSubmitting}
                 />
               )}
@@ -359,13 +324,11 @@ const EditCatalogForm = ({ catalogId }: EditCatalogFormProps) => {
               <>
                 <LoaderCircle className="size-4 animate-spin" />
                 <span>
-                  {uploadingKind === "cover"
-                    ? "در حال آپلود کاور..."
-                    : uploadingKind === "image"
-                      ? "در حال آپلود بنر..."
-                      : uploadingKind === "pdf"
-                        ? "در حال آپلود PDF..."
-                        : "در حال ویرایش کاتالوگ..."}
+                  {uploadingKind === "image"
+                    ? "در حال آپلود بنر..."
+                    : uploadingKind === "pdf"
+                      ? "در حال آپلود PDF..."
+                      : "در حال ویرایش کاتالوگ..."}
                 </span>
               </>
             }

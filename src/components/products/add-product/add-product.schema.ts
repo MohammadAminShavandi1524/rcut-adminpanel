@@ -3,7 +3,7 @@ import { z } from "zod";
 export const addProductSchema = z.object({
   category_id: z.number().int().positive("دسته بندی محصول را انتخاب کنید."),
 
-  brand_id: z.number().int().positive("برند انتخاب شده معتبر نیست.").nullable(),
+  brand_id: z.number().int().positive("انتخاب برند محصول الزامی است."),
 
   name: z
     .string()

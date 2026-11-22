@@ -27,15 +27,9 @@ const EditCatalogMediaField = ({
   isUploading,
   disabled = false,
 }: Props) => {
-  const isCover = kind === "cover";
-  const isBanner = kind === "image";
-  const isImage = kind !== "pdf";
+  const isImage = kind === "image";
 
-  const title = isCover
-    ? "کاور فعلی کاتالوگ"
-    : isBanner
-      ? "بنر فعلی کاتالوگ"
-      : "فایل PDF فعلی";
+  const title = isImage ? "بنر فعلی کاتالوگ" : "فایل PDF فعلی";
 
   return (
     <div className="flex min-w-0 flex-col gap-4">
@@ -58,14 +52,9 @@ const EditCatalogMediaField = ({
 
         {isImage ? (
           <div className="flex flex-wrap items-start gap-4">
-            <div
-              className={
-                isBanner
-                  ? "border-border bg-background flex aspect-[1280/772] w-48 shrink-0 items-center justify-center overflow-hidden rounded-md border sm:w-60"
-                  : "border-border bg-background flex aspect-[3/4] w-28 shrink-0 items-center justify-center overflow-hidden rounded-md border sm:w-36"
-              }
-            >
+            <div className="border-border bg-background flex aspect-[1280/772] w-48 shrink-0 items-center justify-center overflow-hidden rounded-md border sm:w-60">
               {currentUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={currentUrl}
                   alt={title}
@@ -81,7 +70,9 @@ const EditCatalogMediaField = ({
 
             <div className="flex min-w-0 flex-col gap-3">
               <p className="text-muted-foreground text-xs leading-6">
-                اگر تصویر جدیدی انتخاب نکنید، تصویر فعلی حفظ می‌شود.
+                {currentUrl
+                  ? "اگر تصویر جدیدی انتخاب نکنید، تصویر فعلی حفظ می‌شود."
+                  : "برای این کاتالوگ بنری ثبت نشده است. انتخاب بنر اختیاری است."}
               </p>
 
               {currentUrl && (
@@ -134,11 +125,9 @@ const EditCatalogMediaField = ({
 
       {value && (
         <p className="text-custom-primary px-1 text-xs">
-          {isCover
-            ? "کاور جدید جایگزین کاور فعلی خواهد شد."
-            : isBanner
-              ? "بنر جدید جایگزین بنر فعلی خواهد شد."
-              : "PDF جدید جایگزین فایل فعلی خواهد شد."}
+          {isImage
+            ? "بنر جدید جایگزین بنر فعلی خواهد شد."
+            : "PDF جدید جایگزین فایل فعلی خواهد شد."}
         </p>
       )}
     </div>

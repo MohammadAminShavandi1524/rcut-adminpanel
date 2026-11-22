@@ -31,7 +31,6 @@ const AddCatalogForm = () => {
     null,
   );
 
-  const [coverProgress, setCoverProgress] = useState(0);
   const [imageProgress, setImageProgress] = useState(0);
   const [pdfProgress, setPdfProgress] = useState(0);
 
@@ -47,7 +46,6 @@ const AddCatalogForm = () => {
       title: "",
       description: "",
       brand_id: 0,
-      cover: undefined,
       image: undefined,
       file: undefined,
     },
@@ -55,25 +53,20 @@ const AddCatalogForm = () => {
 
   const onSubmit = async (values: AddCatalogValues) => {
     try {
-      setCoverProgress(0);
       setImageProgress(0);
       setPdfProgress(0);
 
-      setUploadingKind("cover");
+      let imageUrl: string | null = null;
 
-      const coverUrl = await uploadCatalogMedia(
-        values.cover,
-        "cover",
-        setCoverProgress,
-      );
+      if (values.image) {
+        setUploadingKind("image");
 
-      setUploadingKind("image");
-
-      const imageUrl = await uploadCatalogMedia(
-        values.image,
-        "image",
-        setImageProgress,
-      );
+        imageUrl = await uploadCatalogMedia(
+          values.image,
+          "image",
+          setImageProgress,
+        );
+      }
 
       setUploadingKind("pdf");
 
@@ -89,7 +82,6 @@ const AddCatalogForm = () => {
         title: values.title.trim(),
         description: values.description.trim(),
         brand_id: values.brand_id,
-        cover: coverUrl,
         image: imageUrl,
         file: pdfUrl,
       });
@@ -98,12 +90,10 @@ const AddCatalogForm = () => {
         title: "",
         description: "",
         brand_id: 0,
-        cover: undefined,
         image: undefined,
         file: undefined,
       });
 
-      setCoverProgress(0);
       setImageProgress(0);
       setPdfProgress(0);
 
@@ -131,8 +121,8 @@ const AddCatalogForm = () => {
         </h2>
 
         <p className="text-muted-foreground 3xl:text-sm 3xl:leading-7 mt-2 text-justify text-xs leading-6 xl:text-[13px]">
-          عنوان، توضیحات و برند کاتالوگ را انتخاب کنید. سپس کاور، تصویر بنر و
-          فایل PDF را بارگذاری کنید. تصویر بنر مستقل از کاور ذخیره می‌شود.
+          عنوان، توضیحات و برند کاتالوگ را انتخاب کنید. فایل PDF را بارگذاری
+          کنید و در صورت تمایل تصویر بنر کاتالوگ را نیز اضافه کنید.
         </p>
       </aside>
 
@@ -172,22 +162,6 @@ const AddCatalogForm = () => {
                   value={field.value || null}
                   onChange={(id) => field.onChange(id ?? 0)}
                   error={errors.brand_id?.message}
-                  disabled={isSubmitting}
-                />
-              )}
-            />
-
-            <Controller
-              control={control}
-              name="cover"
-              render={({ field }) => (
-                <CatalogUploadField
-                  kind="cover"
-                  value={field.value}
-                  onChange={field.onChange}
-                  error={errors.cover?.message}
-                  progress={coverProgress}
-                  isUploading={uploadingKind === "cover"}
                   disabled={isSubmitting}
                 />
               )}
@@ -237,13 +211,11 @@ const AddCatalogForm = () => {
               <>
                 <LoaderCircle className="size-4 animate-spin" />
                 <span>
-                  {uploadingKind === "cover"
-                    ? "در حال آپلود کاور..."
-                    : uploadingKind === "image"
-                      ? "در حال آپلود بنر..."
-                      : uploadingKind === "pdf"
-                        ? "در حال آپلود PDF..."
-                        : "در حال ثبت کاتالوگ..."}
+                  {uploadingKind === "image"
+                    ? "در حال آپلود بنر..."
+                    : uploadingKind === "pdf"
+                      ? "در حال آپلود PDF..."
+                      : "در حال ثبت کاتالوگ..."}
                 </span>
               </>
             }

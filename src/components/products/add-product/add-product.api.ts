@@ -16,7 +16,7 @@ export interface CreateProductPayload {
   description: string;
   image: string;
   category_id: number;
-  brand_id: number | null;
+  brand_id: number;
 }
 
 async function parseResponse(response: Response) {

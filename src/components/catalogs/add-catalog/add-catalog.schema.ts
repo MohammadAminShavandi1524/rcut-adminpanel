@@ -4,21 +4,6 @@ export const MAX_CATALOG_COVER_SIZE = 5 * 1024 * 1024;
 
 export const CATALOG_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
-const requiredImage = (label: string) =>
-  z
-    .custom<File>(
-      (value) => typeof File !== "undefined" && value instanceof File,
-      `${label} الزامی است.`,
-    )
-    .refine(
-      (file) => !!file && file.size > 0 && file.size <= MAX_CATALOG_COVER_SIZE,
-      `حداکثر حجم ${label} ۵ مگابایت است.`,
-    )
-    .refine(
-      (file) => !!file && CATALOG_IMAGE_TYPES.includes(file.type),
-      "فرمت تصویر باید JPG، PNG یا WEBP باشد.",
-    );
-
 export const addCatalogSchema = z.object({
   title: z
     .string()
@@ -30,9 +15,21 @@ export const addCatalogSchema = z.object({
 
   brand_id: z.number().int().positive("انتخاب برند الزامی است."),
 
-  cover: requiredImage("تصویر کاور"),
-
-  image: requiredImage("تصویر بنر"),
+  image: z
+    .custom<File | undefined>(
+      (value) =>
+        value === undefined ||
+        (typeof File !== "undefined" && value instanceof File),
+      "تصویر بنر انتخاب‌شده معتبر نیست.",
+    )
+    .refine(
+      (file) => !file || (file.size > 0 && file.size <= MAX_CATALOG_COVER_SIZE),
+      "حداکثر حجم تصویر بنر ۵ مگابایت است.",
+    )
+    .refine(
+      (file) => !file || CATALOG_IMAGE_TYPES.includes(file.type),
+      "فرمت تصویر باید JPG، PNG یا WEBP باشد.",
+    ),
 
   file: z
     .custom<File>(

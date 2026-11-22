@@ -6,9 +6,8 @@ import { serverApi } from "@/lib/server-api";
 const payloadSchema = z.object({
   title: z.string().trim().min(1),
   description: z.string().trim().min(1),
-  image: z.url(),
+  image: z.url().nullable(),
   brand_id: z.number().int().positive(),
-  cover: z.url(),
   file: z.url(),
 });
 

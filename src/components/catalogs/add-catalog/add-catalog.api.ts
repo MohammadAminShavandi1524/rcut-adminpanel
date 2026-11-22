@@ -1,13 +1,12 @@
 export interface CreateCatalogPayload {
   title: string;
   description: string;
-  image: string;
+  image: string | null;
   brand_id: number;
-  cover: string;
   file: string;
 }
 
-export type CatalogMediaKind = "cover" | "image" | "pdf";
+export type CatalogMediaKind = "image" | "pdf";
 
 interface UploadResponse {
   success?: boolean;
@@ -61,7 +60,7 @@ export function uploadCatalogMedia(
     const xhr = new XMLHttpRequest();
 
     xhr.open("POST", "/api/upload/catalog");
-    xhr.timeout = 180000;
+    xhr.timeout = 3600000;
 
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable) {

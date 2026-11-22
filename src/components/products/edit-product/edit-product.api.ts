@@ -7,7 +7,7 @@ export interface UpdateProductPayload {
   description: string;
   image: string | null;
   category_id: number;
-  brand_id: number | null;
+  brand_id: number;
   new: boolean;
   top_seller: boolean;
 }

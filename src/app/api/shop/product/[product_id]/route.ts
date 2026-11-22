@@ -77,6 +77,13 @@ export async function PUT(request: Request, context: RouteContext) {
     );
   }
 
+  if (!Number.isSafeInteger(body.brand_id) || body.brand_id <= 0) {
+    return NextResponse.json(
+      { detail: "انتخاب برند محصول الزامی است." },
+      { status: 400 },
+    );
+  }
+
   try {
     const data = await serverApi(`/shop/product/${productId}`, {
       method: "PUT",

@@ -26,7 +26,7 @@ interface CatalogBrand {
 
 type CatalogWithBrand = Catalog & {
   brand?: CatalogBrand | string | number | null;
-  brand_id?: number | null;
+  brand_id: number | null;
 };
 
 interface Props {
@@ -185,86 +185,61 @@ const CatalogDetailsModal = ({ open, onClose, catalog }: Props) => {
           data-lenis-prevent
           className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto"
         >
-          <div className="3xl:p-6 grid grid-cols-1 gap-5 p-4 sm:p-5 lg:grid-cols-[190px_minmax(0,1fr)] xl:grid-cols-[210px_minmax(0,1fr)]">
+          <div className="3xl:p-6 flex flex-col gap-5 p-4 sm:p-5">
             <div className="min-w-0">
-              <p className="text-muted-foreground mb-2 text-xs">تصویر کاور</p>
+              <p className="text-muted-foreground mb-2 text-xs">
+                عنوان کاتالوگ
+              </p>
 
-              <div className="border-border bg-secondary-bg/40 flex aspect-[3/4] w-full max-w-[220px] items-center justify-center overflow-hidden rounded-lg border">
-                {catalog.cover ? (
-                  <img
-                    src={catalog.cover}
-                    alt={`کاور ${catalog.title}`}
-                    className="size-full object-contain"
-                  />
-                ) : (
-                  <ImageIcon
-                    className="text-muted-foreground size-9"
-                    strokeWidth={1.5}
-                  />
-                )}
-              </div>
+              <h3 className="text-foreground text-sm leading-7 font-semibold [overflow-wrap:anywhere] sm:text-base">
+                {catalog.title}
+              </h3>
             </div>
 
-            <div className="flex min-w-0 flex-col gap-5">
-              <div className="min-w-0">
-                <p className="text-muted-foreground mb-2 text-xs">
-                  عنوان کاتالوگ
-                </p>
+            <div className="min-w-0">
+              <p className="text-muted-foreground mb-2 text-xs">برند کاتالوگ</p>
 
-                <h3 className="text-foreground text-sm leading-7 font-semibold [overflow-wrap:anywhere] sm:text-base">
-                  {catalog.title}
-                </h3>
-              </div>
+              <p className="text-foreground text-sm font-medium">{brandName}</p>
+            </div>
 
-              <div className="min-w-0">
-                <p className="text-muted-foreground mb-2 text-xs">
-                  برند کاتالوگ
-                </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <CalendarDays
+                className="text-custom-primary size-4"
+                strokeWidth={1.8}
+              />
 
-                <p className="text-foreground text-sm font-medium">
-                  {brandName}
-                </p>
-              </div>
+              <span className="text-muted-foreground text-xs">
+                تاریخ ثبت: {createdLabel}
+              </span>
+            </div>
 
-              <div className="flex flex-wrap items-center gap-2">
-                <CalendarDays
+            <div className="border-border bg-secondary-bg/30 min-w-0 rounded-lg border p-3 sm:p-4">
+              <div className="mb-3 flex items-center gap-2">
+                <FileText
                   className="text-custom-primary size-4"
                   strokeWidth={1.8}
                 />
 
-                <span className="text-muted-foreground text-xs">
-                  تاریخ ثبت: {createdLabel}
-                </span>
+                <h4 className="text-foreground text-sm font-semibold">
+                  فایل کاتالوگ
+                </h4>
               </div>
 
-              <div className="border-border bg-secondary-bg/30 min-w-0 rounded-lg border p-3 sm:p-4">
-                <div className="mb-3 flex items-center gap-2">
-                  <FileText
-                    className="text-custom-primary size-4"
-                    strokeWidth={1.8}
-                  />
-
-                  <h4 className="text-foreground text-sm font-semibold">
-                    فایل کاتالوگ
-                  </h4>
-                </div>
-
-                {catalog.file ? (
-                  <a
-                    href={catalog.file}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="border-custom-primary text-custom-primary hover:bg-custom-primary inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border px-4 text-xs font-medium transition-colors hover:text-white"
-                  >
-                    <ExternalLink className="size-4" />
-                    مشاهده یا دریافت PDF
-                  </a>
-                ) : (
-                  <p className="text-muted-foreground text-xs">
-                    فایل PDF موجود نیست.
-                  </p>
-                )}
-              </div>
+              {catalog.file ? (
+                <a
+                  href={catalog.file}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border-custom-primary text-custom-primary hover:bg-custom-primary inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border px-4 text-xs font-medium transition-colors hover:text-white"
+                >
+                  <ExternalLink className="size-4" />
+                  مشاهده یا دریافت PDF
+                </a>
+              ) : (
+                <p className="text-muted-foreground text-xs">
+                  فایل PDF موجود نیست.
+                </p>
+              )}
             </div>
           </div>
 
@@ -280,6 +255,7 @@ const CatalogDetailsModal = ({ open, onClose, catalog }: Props) => {
                 rel="noopener noreferrer"
                 className="block w-full max-w-[640px]"
               >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={catalog.image}
                   alt={`بنر ${catalog.title}`}

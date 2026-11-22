@@ -33,8 +33,6 @@ export const editCatalogSchema = z.object({
 
   brand_id: z.number().int().positive("انتخاب برند الزامی است."),
 
-  cover: optionalImage("تصویر کاور"),
-
   image: optionalImage("تصویر بنر"),
 
   file: z
